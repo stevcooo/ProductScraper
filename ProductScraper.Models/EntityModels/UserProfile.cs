@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ProductScraper.Web.EntityModels
+namespace ProductScraper.Models.EntityModels
 {
     public class UserProfile
     {

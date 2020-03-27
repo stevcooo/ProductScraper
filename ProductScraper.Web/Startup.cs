@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ProductScraper.Services.Implementations;
+using ProductScraper.Services.Interfaces;
 using ProductScraper.Web.Data;
 
 namespace ProductScraper.Web
@@ -36,6 +38,9 @@ namespace ProductScraper.Web
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddScoped<IProductInfoService, ProductInfoService>();
+            services.AddScoped<IDbContext, ApplicationDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

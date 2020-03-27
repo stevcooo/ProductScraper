@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ProductScraper.Web.EntityModels;
+using ProductScraper.Models.EntityModels;
+using ProductScraper.Services.Interfaces;
 
 namespace ProductScraper.Web.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext, IDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

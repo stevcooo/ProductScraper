@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ProductScraper.Web.EntityModels
+namespace ProductScraper.Models.EntityModels
 {
     public class ProductInfo
     {
