@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using ProductScraper.Models.EntityModels;
 using ProductScraper.Services.Interfaces;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -9,7 +9,6 @@ namespace ProductScraper.Web.Controllers
     public class ProductsController : Controller
     {
         private readonly IProductInfoService _productInfoService;
-
         public ProductsController(IProductInfoService productInfoService)
         {
             _productInfoService = productInfoService;
@@ -18,11 +17,10 @@ namespace ProductScraper.Web.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return View(await _productInfoService.GetAllAsync(userId));
+            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return View(await _productInfoService.GetAllAsync(_userId));
         }
 
-        /*
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -30,10 +28,8 @@ namespace ProductScraper.Web.Controllers
             {
                 return NotFound();
             }
-
-            var productInfo = await _context.ProductInfos
-                .Include(p => p.UserProfile)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var productInfo = await _productInfoService.GetDetailsAsync(_userId, id.Value);
             if (productInfo == null)
             {
                 return NotFound();
@@ -45,7 +41,6 @@ namespace ProductScraper.Web.Controllers
         // GET: Products/Create
         public IActionResult Create()
         {
-            ViewData["UserProfileId"] = new SelectList(_context.UserProfiles, "Id", "Id");
             return View();
         }
 
@@ -54,15 +49,16 @@ namespace ProductScraper.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,URL,Price,SecondPrice,Availability,LastCheckedOn,UserProfileId")] ProductInfo productInfo)
+        public async Task<IActionResult> Create([Bind("URL")] ProductInfo productInfo)
         {
+            //ViewData["UserProfileId"] = new SelectList(_context.UserProfiles, "Id", "Id");
+
             if (ModelState.IsValid)
             {
-                _context.Add(productInfo);
-                await _context.SaveChangesAsync();
+                var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                await _productInfoService.AddAsync(_userId, productInfo);                
                 return RedirectToAction(nameof(Index));
-            }
-            ViewData["UserProfileId"] = new SelectList(_context.UserProfiles, "Id", "Id", productInfo.UserProfileId);
+            }            
             return View(productInfo);
         }
 
@@ -73,13 +69,12 @@ namespace ProductScraper.Web.Controllers
             {
                 return NotFound();
             }
-
-            var productInfo = await _context.ProductInfos.FindAsync(id);
+            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var productInfo = await _productInfoService.GetDetailsAsync(_userId, id.Value);
             if (productInfo == null)
             {
                 return NotFound();
-            }
-            ViewData["UserProfileId"] = new SelectList(_context.UserProfiles, "Id", "Id", productInfo.UserProfileId);
+            }            
             return View(productInfo);
         }
 
@@ -88,7 +83,7 @@ namespace ProductScraper.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,URL,Price,SecondPrice,Availability,LastCheckedOn,UserProfileId")] ProductInfo productInfo)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,URL")] ProductInfo productInfo)
         {
             if (id != productInfo.Id)
             {
@@ -97,25 +92,10 @@ namespace ProductScraper.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(productInfo);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductInfoExists(productInfo.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                await _productInfoService.UpdateAsync(_userId, productInfo);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserProfileId"] = new SelectList(_context.UserProfiles, "Id", "Id", productInfo.UserProfileId);
             return View(productInfo);
         }
 
@@ -126,10 +106,8 @@ namespace ProductScraper.Web.Controllers
             {
                 return NotFound();
             }
-
-            var productInfo = await _context.ProductInfos
-                .Include(p => p.UserProfile)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var productInfo = await _productInfoService.GetDetailsAsync(_userId, id.Value);
             if (productInfo == null)
             {
                 return NotFound();
@@ -143,16 +121,9 @@ namespace ProductScraper.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var productInfo = await _context.ProductInfos.FindAsync(id);
-            _context.ProductInfos.Remove(productInfo);
-            await _context.SaveChangesAsync();
+            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await _productInfoService.DeleteAsync(_userId, id);
             return RedirectToAction(nameof(Index));
         }
-
-        private bool ProductInfoExists(int id)
-        {
-            return _context.ProductInfos.Any(e => e.Id == id);
-        }
-        */
     }
 }
