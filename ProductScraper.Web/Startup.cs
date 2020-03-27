@@ -40,6 +40,7 @@ namespace ProductScraper
             services.AddRazorPages();
 
             services.AddScoped<IProductInfoService, ProductInfoService>();
+            services.AddScoped<IScrapeService, ScrapeService>();
             services.AddScoped<IDbContext, ApplicationDbContext>();
         }
 

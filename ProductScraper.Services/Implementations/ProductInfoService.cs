@@ -11,11 +11,12 @@ namespace ProductScraper.Services.Implementations
     public class ProductInfoService : IProductInfoService
     {
         private readonly IDbContext _context;
+        private readonly IScrapeService _scrapeService;
 
-        public ProductInfoService(IDbContext context)
+        public ProductInfoService(IDbContext context, IScrapeService scrapeService)
         {
             _context = context;
-
+            _scrapeService = scrapeService;
         }
 
         public async Task<IList<ProductInfo>> GetAllAsync(string userId)
@@ -36,6 +37,8 @@ namespace ProductScraper.Services.Implementations
         {
             var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(t => t.UserId == userId);
             productInfo.UserProfileId = userProfile.Id;
+
+            _scrapeService.ScrapeProductInfo(productInfo);
             await _context.AddAsync(productInfo);
             await _context.SaveChangesAsync();
         }
@@ -49,7 +52,7 @@ namespace ProductScraper.Services.Implementations
                 throw new Exception("Item not found");
 
             product.URL = productInfo.URL;
-
+            _scrapeService.ScrapeProductInfo(product);
             try
             {
                 _context.Update(product);
