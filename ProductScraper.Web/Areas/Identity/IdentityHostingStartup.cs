@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ProductScraper.Web.Data;
+using ProductScraper.Data;
 
-[assembly: HostingStartup(typeof(ProductScraper.Web.Areas.Identity.IdentityHostingStartup))]
-namespace ProductScraper.Web.Areas.Identity
+[assembly: HostingStartup(typeof(ProductScraper.Areas.Identity.IdentityHostingStartup))]
+namespace ProductScraper.Areas.Identity
 {
     public class IdentityHostingStartup : IHostingStartup
     {

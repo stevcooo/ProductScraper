@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace ProductScraper.Web.Areas.Identity.Pages.Account.Manage
+namespace ProductScraper.Areas.Identity.Pages.Account.Manage
 {
     public class EnableAuthenticatorModel : PageModel
     {
@@ -148,7 +148,7 @@ namespace ProductScraper.Web.Areas.Identity.Pages.Account.Manage
         {
             return string.Format(
                 AuthenticatorUriFormat,
-                _urlEncoder.Encode("ProductScraper.Web"),
+                _urlEncoder.Encode("ProductScraper"),
                 _urlEncoder.Encode(email),
                 unformattedKey);
         }

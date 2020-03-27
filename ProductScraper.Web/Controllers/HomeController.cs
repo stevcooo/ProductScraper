@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ProductScraper.Web.Models;
+using ProductScraper.Models;
 using System.Diagnostics;
 
-namespace ProductScraper.Web.Controllers
+namespace ProductScraper.Controllers
 {
     public class HomeController : Controller
     {

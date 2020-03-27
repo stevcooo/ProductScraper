@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Services.Interfaces;
 
-namespace ProductScraper.Web.Data
+namespace ProductScraper.Data
 {
     public class ApplicationDbContext : IdentityDbContext, IDbContext
     {

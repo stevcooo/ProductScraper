@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using ProductScraper.Web.Data;
+using ProductScraper.Data;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProductScraper.Web.Areas.Identity.Pages.Account.Manage
+namespace ProductScraper.Areas.Identity.Pages.Account.Manage
 {
     public partial class IndexModel : PageModel
     {

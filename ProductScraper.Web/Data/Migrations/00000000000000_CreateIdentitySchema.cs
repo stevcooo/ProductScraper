@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace ProductScraper.Web.Data.Migrations
+namespace ProductScraper.Data.Migrations
 {
     public partial class CreateIdentitySchema : Migration
     {

@@ -5,7 +5,7 @@ using ProductScraper.Services.Interfaces;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace ProductScraper.Web.Controllers
+namespace ProductScraper.Controllers
 {
     [Authorize]
     public class ProductsController : Controller

@@ -1,6 +1,6 @@
 using System;
 
-namespace ProductScraper.Web.Models
+namespace ProductScraper.Models
 {
     public class ErrorViewModel
     {

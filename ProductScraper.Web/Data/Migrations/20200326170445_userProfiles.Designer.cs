@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ProductScraper.Web.Data;
+using ProductScraper.Data;
 
-namespace ProductScraper.Web.Data.Migrations
+namespace ProductScraper.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20200326170445_userProfiles")]
@@ -221,7 +221,7 @@ namespace ProductScraper.Web.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("ProductScraper.Web.EntityModels.ProductInfo", b =>
+            modelBuilder.Entity("ProductScraper.EntityModels.ProductInfo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -256,7 +256,7 @@ namespace ProductScraper.Web.Data.Migrations
                     b.ToTable("ProductInfos");
                 });
 
-            modelBuilder.Entity("ProductScraper.Web.EntityModels.UserProfile", b =>
+            modelBuilder.Entity("ProductScraper.EntityModels.UserProfile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -328,9 +328,9 @@ namespace ProductScraper.Web.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ProductScraper.Web.EntityModels.ProductInfo", b =>
+            modelBuilder.Entity("ProductScraper.EntityModels.ProductInfo", b =>
                 {
-                    b.HasOne("ProductScraper.Web.EntityModels.UserProfile", "UserProfile")
+                    b.HasOne("ProductScraper.EntityModels.UserProfile", "UserProfile")
                         .WithMany("ProductInfos")
                         .HasForeignKey("UserProfileId")
                         .OnDelete(DeleteBehavior.Cascade)

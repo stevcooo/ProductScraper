@@ -7,9 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProductScraper.Services.Implementations;
 using ProductScraper.Services.Interfaces;
-using ProductScraper.Web.Data;
+using ProductScraper.Data;
 
-namespace ProductScraper.Web
+namespace ProductScraper
 {
     public class Startup
     {
