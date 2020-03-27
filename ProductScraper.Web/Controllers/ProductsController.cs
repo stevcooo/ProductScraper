@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Services.Interfaces;
 using System.Security.Claims;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProductScraper.Web.Controllers
 {
+    [Authorize]
     public class ProductsController : Controller
     {
         private readonly IProductInfoService _productInfoService;
