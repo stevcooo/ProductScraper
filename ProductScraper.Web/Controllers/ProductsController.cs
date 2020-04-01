@@ -11,6 +11,7 @@ namespace ProductScraper.Controllers
     public class ProductsController : Controller
     {
         private readonly IProductInfoService _productInfoService;
+
         public ProductsController(IProductInfoService productInfoService)
         {
             _productInfoService = productInfoService;
@@ -53,8 +54,6 @@ namespace ProductScraper.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("URL")] ProductInfo productInfo)
         {
-            //ViewData["UserProfileId"] = new SelectList(_context.UserProfiles, "Id", "Id");
-
             if (ModelState.IsValid)
             {
                 var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

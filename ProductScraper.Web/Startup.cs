@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using ProductScraper.Services.Implementations;
 using ProductScraper.Services.Interfaces;
 using ProductScraper.Data;
+using Microsoft.AspNetCore.Mvc.Razor;
 
 namespace ProductScraper
 {
@@ -36,11 +37,13 @@ namespace ProductScraper
                     options.User.RequireUniqueEmail = true;
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
             services.AddControllersWithViews();
             services.AddRazorPages();
 
             services.AddScoped<IProductInfoService, ProductInfoService>();
             services.AddScoped<IScrapeService, ScrapeService>();
+            services.AddScoped<IScrapeConfigService, ScrapeConfigService>();
             services.AddScoped<IDbContext, ApplicationDbContext>();
         }
 
@@ -68,6 +71,9 @@ namespace ProductScraper
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                   name: "Admin",
+                   pattern: "{area:exists}/{controller=ScrapeConfigs}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

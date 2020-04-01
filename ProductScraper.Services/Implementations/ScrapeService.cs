@@ -4,6 +4,7 @@ using ProductScraper.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ProductScraper.Services.Implementations
 {
@@ -13,19 +14,18 @@ namespace ProductScraper.Services.Implementations
         private readonly IScraper _tehnomarketScraper;
         private readonly IScraper _setTecScraper;
         private readonly GenericScraper _genericScraper;
+        private readonly IScrapeConfigService _scrapeConfigService;
 
         //This should be loaded from service/db
         List<ScrapeConfig> ScrapeConfigs = new List<ScrapeConfig>();
 
-        public ScrapeService()
+        public ScrapeService(IScrapeConfigService scrapeConfigService)
         {
             _anhochScraper = new AnhochScraper();
             _tehnomarketScraper = new TehnomarketScraper();
             _setTecScraper = new SetTecScraper();
             _genericScraper = new GenericScraper();
-
-            //This should be loaded from service/db
-            AddConfigs();
+            _scrapeConfigService = scrapeConfigService;            
         }
 
         //This should be loaded from service/db
@@ -44,9 +44,10 @@ namespace ProductScraper.Services.Implementations
             ScrapeConfigs.Add(anhoch);
         }
 
-        public bool ScrapeProductInfo(ProductInfo product)
+        public async Task<bool> ScrapeProductInfoAsync(ProductInfo product)
         {
-            var configs = ScrapeConfigs.Where(t => product.URL.Contains(t.URL)).ToList();
+            var allConfigs = await _scrapeConfigService.GetAllAsync();
+            var configs = allConfigs.Where(t => product.URL.Contains(t.URL)).ToList();
             if (configs.Any())
             {
                 if (configs.Count > 1)

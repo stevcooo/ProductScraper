@@ -1,9 +1,10 @@
 ﻿using ProductScraper.Models.EntityModels;
+using System.Threading.Tasks;
 
 namespace ProductScraper.Services.Interfaces
 {
     public interface IScrapeService
     {
-        bool ScrapeProductInfo(ProductInfo productInfo);
+        Task<bool> ScrapeProductInfoAsync(ProductInfo productInfo);
     }
 }

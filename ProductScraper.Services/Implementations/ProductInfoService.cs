@@ -38,7 +38,7 @@ namespace ProductScraper.Services.Implementations
             var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(t => t.UserId == userId);
             productInfo.UserProfileId = userProfile.Id;
 
-            _scrapeService.ScrapeProductInfo(productInfo);
+            await _scrapeService.ScrapeProductInfoAsync(productInfo);
             await _context.AddAsync(productInfo);
             await _context.SaveChangesAsync();
         }
@@ -52,7 +52,7 @@ namespace ProductScraper.Services.Implementations
                 throw new Exception("Item not found");
 
             product.URL = productInfo.URL;
-            _scrapeService.ScrapeProductInfo(product);
+            await _scrapeService.ScrapeProductInfoAsync(product);
             try
             {
                 _context.Update(product);
