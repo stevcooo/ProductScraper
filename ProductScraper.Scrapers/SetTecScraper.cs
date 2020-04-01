@@ -48,5 +48,10 @@ namespace ProductScraper.Scrapers
 
             return hasChanges;
         }
+
+        public bool Scrape(ScrapeConfig scrapeConfig, ProductInfo product)
+        {
+            return Scrape(product);
+        }
     }
 }
