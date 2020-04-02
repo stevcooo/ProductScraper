@@ -44,6 +44,11 @@
                 <span asp-validation-for="ProductAvailabilityPath" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="ProductAvailabilityValue" class="control-label"></label>
+                <input asp-for="ProductAvailabilityValue" class="form-control" />
+                <span asp-validation-for="ProductAvailabilityValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>

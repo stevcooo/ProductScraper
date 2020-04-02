@@ -9,5 +9,6 @@
         public string ProductPricePath { get; set; }
         public string ProductSecondPricePath { get; set; }
         public string ProductAvailabilityPath { get; set; }
+        public string ProductAvailabilityValue { get; set; }
     }
 }

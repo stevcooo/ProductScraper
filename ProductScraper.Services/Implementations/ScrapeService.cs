@@ -4,6 +4,7 @@ using ProductScraper.Services.Exceptions;
 using ProductScraper.Services.Interfaces;
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ProductScraper.Services.Implementations
@@ -12,11 +13,13 @@ namespace ProductScraper.Services.Implementations
     {
         private readonly IScrapeConfigService _scrapeConfigService;
         private readonly HtmlWeb _htmlWeb;
+        private readonly WebClient _webClient;
 
         public ScrapeService(IScrapeConfigService scrapeConfigService)
         {
             _scrapeConfigService = scrapeConfigService;
             _htmlWeb = new HtmlWeb();
+            _webClient = new WebClient();
         }
 
         public async Task ScrapeProductInfoAsync(ProductInfo product)
@@ -46,8 +49,12 @@ namespace ProductScraper.Services.Implementations
             if (string.IsNullOrWhiteSpace(product.URL))
                 throw new Exception("URL can not be empty!");
 
+            
+            string html = _webClient.DownloadString(product.URL);
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
             product.HasChangesSinceLastTime = false;
-            HtmlDocument doc = _htmlWeb.Load(product.URL);
 
             try
             {
@@ -98,7 +105,15 @@ namespace ProductScraper.Services.Implementations
             try
             {
                 var availabilityNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductAvailabilityPath);
-                bool isAviliable = availabilityNode != null;
+                bool isAviliable = false;
+
+                if (!String.IsNullOrEmpty(scrapeConfig.ProductAvailabilityValue) && availabilityNode.InnerText == scrapeConfig.ProductAvailabilityValue)
+                    isAviliable = true;
+                else
+                {
+                    isAviliable = availabilityNode != null;
+                }
+
                 if (product.Availability != isAviliable)
                 {
                     product.HasChangesSinceLastTime = true;
