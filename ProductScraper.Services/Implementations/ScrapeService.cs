@@ -105,20 +105,38 @@ namespace ProductScraper.Services.Implementations
             try
             {
                 var availabilityNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductAvailabilityPath);
-                bool isAviliable = false;
+                if (availabilityNode != null)
+                {
+                    bool isAviliable = false;
 
-                if (!String.IsNullOrEmpty(scrapeConfig.ProductAvailabilityValue) && availabilityNode.InnerText == scrapeConfig.ProductAvailabilityValue)
-                    isAviliable = true;
+                    if (scrapeConfig.ProductAvailabilityIsAtributeValue)
+                    {
+                        var attr = availabilityNode.Attributes.FirstOrDefault(t => t.Value == scrapeConfig.ProductAvailabilityValue);
+                        if (attr != null)
+                        {
+                            isAviliable = true;
+                        }
+                    }
+                    else
+                    {
+                        if (!String.IsNullOrEmpty(scrapeConfig.ProductAvailabilityValue) && availabilityNode.InnerText == scrapeConfig.ProductAvailabilityValue)
+                            isAviliable = true;
+                        else
+                        {
+                            isAviliable = availabilityNode != null;
+                        }
+
+                    }
+
+                    if (product.Availability != isAviliable)
+                    {
+                        product.HasChangesSinceLastTime = true;
+                        product.Availability = isAviliable;
+                    }
+                }
                 else
-                {
-                    isAviliable = availabilityNode != null;
-                }
+                    product.Availability = null;
 
-                if (product.Availability != isAviliable)
-                {
-                    product.HasChangesSinceLastTime = true;
-                    product.Availability = isAviliable;
-                }
             }
             catch (Exception ex)
             {

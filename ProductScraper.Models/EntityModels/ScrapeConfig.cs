@@ -10,5 +10,6 @@
         public string ProductSecondPricePath { get; set; }
         public string ProductAvailabilityPath { get; set; }
         public string ProductAvailabilityValue { get; set; }
+        public bool ProductAvailabilityIsAtributeValue { get; set; }
     }
 }

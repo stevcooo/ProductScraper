@@ -49,7 +49,7 @@ namespace ProductScraper.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,URL,ProductNamePath,ProductPricePath,ProductSecondPricePath,ProductAvailabilityPath,ProductAvailabilityValue")] ScrapeConfig scrapeConfig)
+        public async Task<IActionResult> Create([Bind("Name,URL,ProductNamePath,ProductPricePath,ProductSecondPricePath,ProductAvailabilityPath,ProductAvailabilityValue,ProductAvailabilityIsAtributeValue")] ScrapeConfig scrapeConfig)
         {
             if (ModelState.IsValid)
             {
@@ -79,7 +79,7 @@ namespace ProductScraper.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,URL,ProductNamePath,ProductPricePath,ProductSecondPricePath,ProductAvailabilityPath,ProductAvailabilityValue")] ScrapeConfig scrapeConfig)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,URL,ProductNamePath,ProductPricePath,ProductSecondPricePath,ProductAvailabilityPath,ProductAvailabilityValue,ProductAvailabilityIsAtributeValue")] ScrapeConfig scrapeConfig)
         {
             if (id != scrapeConfig.Id)
             {
