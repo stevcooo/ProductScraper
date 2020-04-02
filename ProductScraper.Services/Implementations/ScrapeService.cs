@@ -1,8 +1,8 @@
-﻿using ProductScraper.Models.EntityModels;
-using ProductScraper.Scrapers;
+﻿using HtmlAgilityPack;
+using ProductScraper.Models.EntityModels;
+using ProductScraper.Services.Exceptions;
 using ProductScraper.Services.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,41 +10,16 @@ namespace ProductScraper.Services.Implementations
 {
     public class ScrapeService : IScrapeService
     {
-        private readonly IScraper _anhochScraper;
-        private readonly IScraper _tehnomarketScraper;
-        private readonly IScraper _setTecScraper;
-        private readonly GenericScraper _genericScraper;
         private readonly IScrapeConfigService _scrapeConfigService;
-
-        //This should be loaded from service/db
-        List<ScrapeConfig> ScrapeConfigs = new List<ScrapeConfig>();
+        private readonly HtmlWeb _htmlWeb;
 
         public ScrapeService(IScrapeConfigService scrapeConfigService)
         {
-            _anhochScraper = new AnhochScraper();
-            _tehnomarketScraper = new TehnomarketScraper();
-            _setTecScraper = new SetTecScraper();
-            _genericScraper = new GenericScraper();
-            _scrapeConfigService = scrapeConfigService;            
+            _scrapeConfigService = scrapeConfigService;
+            _htmlWeb = new HtmlWeb();
         }
 
-        //This should be loaded from service/db
-        private void AddConfigs()
-        {
-            ScrapeConfigs = new List<ScrapeConfig>();
-            ScrapeConfig anhoch = new ScrapeConfig()
-            {
-                Name = "Anhoch",
-                URL = "anhoch.com",
-                ProductNamePath = "/body[1]/div[3]/div[1]/div[1]/div[1]/section[1]/div[1]/div[3]/section[1]/div[1]/div[1]/h3[1]",
-                ProductPricePath = "/body[1]/div[3]/div[1]/div[1]/div[1]/section[1]/div[1]/div[3]/section[1]/div[1]/div[2]/section[1]/div[1]/div[2]/div[1]/div[1]/div[1]/span[1]",
-                ProductSecondPricePath = "",
-                ProductAvailabilityPath = "/body[1]/div[3]/div[1]/div[1]/div[1]/section[1]/div[1]/div[3]/section[1]/div[1]/div[2]/section[1]/div[1]/div[2]/div[1]/div[2]/a[2]/i[1]",
-            };
-            ScrapeConfigs.Add(anhoch);
-        }
-
-        public async Task<bool> ScrapeProductInfoAsync(ProductInfo product)
+        public async Task ScrapeProductInfoAsync(ProductInfo product)
         {
             var allConfigs = await _scrapeConfigService.GetAllAsync();
             var configs = allConfigs.Where(t => product.URL.Contains(t.URL)).ToList();
@@ -55,21 +30,88 @@ namespace ProductScraper.Services.Implementations
                     //Alert if more than one config exists for current url
                     //Do not throw error, just send an email to the admin and continue processing with the last one                    
                 }
-                return _genericScraper.Scrape(configs.FirstOrDefault(), product);
+                Scrape(configs.FirstOrDefault(), product);
             }
-            else //Try hardcoded configs
+            else
             {
-                if (product.URL.Contains("anhoch.com"))
-                    return _anhochScraper.Scrape(product);
+                //Alert if more no config exists so it should be added
+                throw new ScrapeServiceException("Unsupported URL!");
+            }
+        }
 
-                if (product.URL.Contains("tehnomarket.com"))
-                    return _tehnomarketScraper.Scrape(product);
+        public void Scrape(ScrapeConfig scrapeConfig, ProductInfo product)
+        {
+            bool hasError = false;
 
-                if (product.URL.Contains("setec.mk"))
-                    return _setTecScraper.Scrape(product);
+            if (string.IsNullOrWhiteSpace(product.URL))
+                throw new Exception("URL can not be empty!");
+
+            product.HasChangesSinceLastTime = false;
+            HtmlDocument doc = _htmlWeb.Load(product.URL);
+
+            try
+            {
+                var titleNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductNamePath);
+                if (titleNode != null && product.Name != titleNode.InnerText)
+                {
+                    product.HasChangesSinceLastTime = true;
+                    product.Name = titleNode.InnerText;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Log the exception
+                hasError = true;
             }
 
-            throw new Exception("Not supported url!");
+            try
+            {
+                var priceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductPricePath);
+                if (priceNode != null && product.Price != priceNode.InnerText)
+                {
+                    product.HasChangesSinceLastTime = true;
+                    product.Price = priceNode.InnerText;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Log the exception
+                hasError = true;
+            }
+
+
+            try
+            {
+                var secondPriceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductSecondPricePath);
+                if (secondPriceNode != null && product.SecondPrice != secondPriceNode.InnerText)
+                {
+                    product.HasChangesSinceLastTime = true;
+                    product.SecondPrice = secondPriceNode.InnerText;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Log the exception
+                hasError = true;
+            }
+
+            try
+            {
+                var availabilityNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductAvailabilityPath);
+                bool isAviliable = availabilityNode != null;
+                if (product.Availability != isAviliable)
+                {
+                    product.HasChangesSinceLastTime = true;
+                    product.Availability = isAviliable;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Log the exception
+                hasError = true;
+            }
+
+            product.LastCheckedOn = DateTime.UtcNow;
         }
     }
 }

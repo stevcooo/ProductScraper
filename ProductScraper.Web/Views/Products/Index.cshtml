@@ -12,25 +12,30 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
+            <th style="width: 35%">
+                Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.URL)
+                Link
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                Price
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SecondPrice)
+                Second price
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Availability)
+                Available
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastCheckedOn)
+                Last checked
             </th>
-            <th></th>
+            <th>
+                Changed
+            </th>
+            <th style="width: 15%">
+                Actions
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -49,14 +54,34 @@
                 @Html.DisplayFor(modelItem => item.SecondPrice)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Availability)
+                @if (item.Availability.HasValue)
+                {
+                    if (item.Availability.Value)
+                    {
+                        <i class="fas fa-check text-success"></i>
+                    }
+                    else
+                    {
+                        <i class="fas fa-times text-danger"></i>
+                    }
+                }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.LastCheckedOn)
             </td>
             <td>
+                @if (item.HasChangesSinceLastTime)
+                {
+                    <i class="fas fa-check text-success"></i>
+                }
+                else
+                {
+                    <i class="fas fa-times text-danger"></i>
+                }
+            </td>
+            <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Info</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>

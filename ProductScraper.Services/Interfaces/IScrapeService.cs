@@ -5,6 +5,6 @@ namespace ProductScraper.Services.Interfaces
 {
     public interface IScrapeService
     {
-        Task<bool> ScrapeProductInfoAsync(ProductInfo productInfo);
+        Task ScrapeProductInfoAsync(ProductInfo productInfo);
     }
 }

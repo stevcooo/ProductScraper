@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProductScraper.Models.EntityModels;
+using ProductScraper.Services.Exceptions;
 using ProductScraper.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace ProductScraper.Services.Implementations
             var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(t => t.UserId == userId);
             productInfo.UserProfileId = userProfile.Id;
 
-            await _scrapeService.ScrapeProductInfoAsync(productInfo);
+            await _scrapeService.ScrapeProductInfoAsync(productInfo);            
             await _context.AddAsync(productInfo);
             await _context.SaveChangesAsync();
         }

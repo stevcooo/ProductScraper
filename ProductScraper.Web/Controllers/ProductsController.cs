@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProductScraper.Models.EntityModels;
+using ProductScraper.Services.Exceptions;
 using ProductScraper.Services.Interfaces;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -57,7 +58,15 @@ namespace ProductScraper.Controllers
             if (ModelState.IsValid)
             {
                 var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                await _productInfoService.AddAsync(_userId, productInfo);                
+                try
+                {
+                    await _productInfoService.AddAsync(_userId, productInfo);
+                }
+                catch (ScrapeServiceException exception)
+                {
+                    ViewBag.Exception = exception.Message;
+                    return View(productInfo);
+                }
                 return RedirectToAction(nameof(Index));
             }            
             return View(productInfo);
@@ -94,7 +103,15 @@ namespace ProductScraper.Controllers
             if (ModelState.IsValid)
             {
                 var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                await _productInfoService.UpdateAsync(_userId, productInfo);
+                try
+                {
+                    await _productInfoService.UpdateAsync(_userId, productInfo);
+                }
+                catch (ScrapeServiceException exception)
+                {
+                    ViewBag.Exception = exception.Message;
+                    return View(productInfo);
+                }
                 return RedirectToAction(nameof(Index));
             }
             return View(productInfo);

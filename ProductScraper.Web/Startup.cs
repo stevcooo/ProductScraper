@@ -38,7 +38,7 @@ namespace ProductScraper
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
 
             services.AddScoped<IProductInfoService, ProductInfoService>();
