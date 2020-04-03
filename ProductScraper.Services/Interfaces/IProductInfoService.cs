@@ -8,6 +8,7 @@ namespace ProductScraper.Services.Interfaces
     {
         Task<IList<ProductInfo>> GetAllAsync(string userId);
         Task<ProductInfo> GetDetailsAsync(string userId, int id);
+        Task CheckAsync(string userId, int id);
         Task AddAsync(string userId, ProductInfo productInfo);
         Task UpdateAsync(string userId, ProductInfo productInfo);
         Task DeleteAsync(string userId, int id);

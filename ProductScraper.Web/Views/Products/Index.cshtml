@@ -33,7 +33,7 @@
             <th>
                 Changed
             </th>
-            <th style="width: 15%">
+            <th style="width: 20%">
                 Actions
             </th>
         </tr>
@@ -80,6 +80,7 @@
                 }
             </td>
             <td>
+                <a asp-action="Check" asp-route-id="@item.Id">Check</a> |
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Info</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>

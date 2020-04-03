@@ -42,6 +42,19 @@ namespace ProductScraper.Controllers
             return View(productInfo);
         }
 
+        // GET: Products/Check
+        public async Task<IActionResult> Check(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await _productInfoService.CheckAsync(_userId, id.Value);
+
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Products/Create
         public IActionResult Create()
         {
