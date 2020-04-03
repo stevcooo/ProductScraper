@@ -13,12 +13,15 @@ namespace ProductScraper.Services.Implementations
     public class ScrapeService : IScrapeService
     {
         private readonly IScrapeConfigService _scrapeConfigService;
+        private readonly IExceptionMessageService _exceptionMessageService;
         private readonly IEmailSender _emailSender;
         private readonly WebClient _webClient;
 
-        public ScrapeService(IScrapeConfigService scrapeConfigService, IEmailSender emailSender)
+        public ScrapeService(IScrapeConfigService scrapeConfigService, 
+            IEmailSender emailSender, IExceptionMessageService exceptionMessageService)
         {
             _scrapeConfigService = scrapeConfigService;
+            _exceptionMessageService = exceptionMessageService;
             _emailSender = emailSender;
             _webClient = new WebClient();
         }
@@ -32,16 +35,16 @@ namespace ProductScraper.Services.Implementations
                 if (configs.Count > 1)
                     SendEmailToAdmin("Duplicate condifuration", $"For url {product.URL} there are multiple configurations!");
 
-                Scrape(configs.FirstOrDefault(), product);
+                await Scrape(configs.FirstOrDefault(), product);
             }
             else
             {
-                SendEmailToAdmin("Missing condifuration", $"Missing configuration for URL: {product.URL}, UserProfileId: {product.UserProfileId}");                
+                SendEmailToAdmin("Missing condifuration", $"Missing configuration for URL: {product.URL}, UserProfileId: {product.UserProfileId}");
                 throw new ScrapeServiceException("Sorry, currently we don't support this URL, as soon as we support it, we will let you know.");
             }
         }
 
-        private void Scrape(ScrapeConfig scrapeConfig, ProductInfo product)
+        private async Task Scrape(ScrapeConfig scrapeConfig, ProductInfo product)
         {
             if (string.IsNullOrWhiteSpace(product.URL))
                 throw new Exception("URL can not be empty!");
@@ -63,8 +66,14 @@ namespace ProductScraper.Services.Implementations
             }
             catch (Exception ex)
             {
-                SendEmailToAdmin("ScrapServiceException", ex.Message);
                 //Log the exception
+                await _exceptionMessageService.AddAsync(new ExceptionMessage()
+                {
+                    Message = ex.Message,
+                    Method = this.GetType().Name,
+                    ProductId = product.Id,
+                    UserId = product.UserProfile.UserId
+                });
             }
 
             try
@@ -78,8 +87,14 @@ namespace ProductScraper.Services.Implementations
             }
             catch (Exception ex)
             {
-                SendEmailToAdmin("ScrapServiceException", ex.Message);
                 //Log the exception
+                await _exceptionMessageService.AddAsync(new ExceptionMessage()
+                {
+                    Message = ex.Message,
+                    Method = this.GetType().Name,
+                    ProductId = product.Id,
+                    UserId = product.UserProfile.UserId
+                });
             }
 
 
@@ -94,8 +109,14 @@ namespace ProductScraper.Services.Implementations
             }
             catch (Exception ex)
             {
-                SendEmailToAdmin("ScrapServiceException", ex.Message);
                 //Log the exception
+                await _exceptionMessageService.AddAsync(new ExceptionMessage()
+                {
+                    Message = ex.Message,
+                    Method = this.GetType().Name,
+                    ProductId = product.Id,
+                    UserId = product.UserProfile.UserId
+                });
             }
 
             try
@@ -136,8 +157,14 @@ namespace ProductScraper.Services.Implementations
             }
             catch (Exception ex)
             {
-                SendEmailToAdmin("ScrapServiceException", ex.Message);
                 //Log the exception
+                await _exceptionMessageService.AddAsync(new ExceptionMessage()
+                {
+                    Message = ex.Message,
+                    Method = this.GetType().Name,
+                    ProductId = product.Id,
+                    UserId = product.UserProfile.UserId
+                });
             }
             product.LastCheckedOn = DateTime.UtcNow;
 

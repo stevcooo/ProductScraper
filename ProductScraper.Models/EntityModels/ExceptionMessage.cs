@@ -4,6 +4,11 @@ namespace ProductScraper.Models.EntityModels
 {
     public class ExceptionMessage
     {
+        public ExceptionMessage()
+        {
+            DateTime = DateTime.UtcNow;
+        }
+
         public long Id { get; set; }
         public string Method { get; set; }
         public string Message { get; set; }

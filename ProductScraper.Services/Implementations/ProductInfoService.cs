@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProductScraper.Models.EntityModels;
-using ProductScraper.Services.Exceptions;
 using ProductScraper.Services.Interfaces;
 using System;
 using System.Collections.Generic;
