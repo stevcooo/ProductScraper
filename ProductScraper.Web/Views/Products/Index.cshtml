@@ -16,9 +16,6 @@
                 Name
             </th>
             <th>
-                Link
-            </th>
-            <th>
                 Price
             </th>
             <th>
@@ -42,10 +39,8 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a href="@item.URL">Link</a>
+                <a target="_blank" href="@item.URL">@item.Name</a>
+
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Price)
