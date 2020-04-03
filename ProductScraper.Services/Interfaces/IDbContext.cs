@@ -15,5 +15,6 @@ namespace ProductScraper.Services.Interfaces
         DbSet<ProductInfo> ProductInfos { get; set; }
         DbSet<UserProfile> UserProfiles { get; set; }
         DbSet<ScrapeConfig> ScrapeConfigs { get; set; }
+        DbSet<ExceptionMessage> ExceptionMessages { get; set; }
     }
 }
