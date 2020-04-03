@@ -11,10 +11,9 @@ namespace ProductScraper.Data
             : base(options)
         {
         }
-
+        
         public DbSet<ProductInfo> ProductInfos { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<ScrapeConfig> ScrapeConfigs { get; set; }
-
     }
 }

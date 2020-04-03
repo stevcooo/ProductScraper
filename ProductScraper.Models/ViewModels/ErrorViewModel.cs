@@ -1,4 +1,4 @@
-namespace ProductScraper.ViewModels
+﻿namespace ProductScraper.Models.ViewModels
 {
     public class ErrorViewModel
     {

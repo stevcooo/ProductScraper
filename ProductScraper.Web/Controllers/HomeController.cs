@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ProductScraper.ViewModels;
+using ProductScraper.Models.ViewModels;
 using System.Diagnostics;
 
 namespace ProductScraper.Controllers

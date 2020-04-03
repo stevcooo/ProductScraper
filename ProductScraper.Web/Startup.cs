@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ProductScraper.Data;
+using ProductScraper.Models.ViewModels;
 using ProductScraper.Services.Implementations;
 using ProductScraper.Services.Interfaces;
-using ProductScraper.Data;
-using Microsoft.AspNetCore.Mvc.Razor;
 
 namespace ProductScraper
 {
@@ -38,6 +38,9 @@ namespace ProductScraper
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            var emailConfig = Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
+            services.AddSingleton(emailConfig);
+
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
 
@@ -45,6 +48,7 @@ namespace ProductScraper
             services.AddScoped<IScrapeService, ScrapeService>();
             services.AddScoped<IScrapeConfigService, ScrapeConfigService>();
             services.AddScoped<IDbContext, ApplicationDbContext>();
+            services.AddScoped<IEmailSender, EmailSender>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

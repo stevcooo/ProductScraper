@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using ProductScraper.Models.EntityModels;
+using ProductScraper.Models.ViewModels;
 using ProductScraper.Services.Exceptions;
 using ProductScraper.Services.Interfaces;
 using System;
@@ -12,13 +13,13 @@ namespace ProductScraper.Services.Implementations
     public class ScrapeService : IScrapeService
     {
         private readonly IScrapeConfigService _scrapeConfigService;
-        private readonly HtmlWeb _htmlWeb;
+        private readonly IEmailSender _emailSender;
         private readonly WebClient _webClient;
 
-        public ScrapeService(IScrapeConfigService scrapeConfigService)
+        public ScrapeService(IScrapeConfigService scrapeConfigService, IEmailSender emailSender)
         {
             _scrapeConfigService = scrapeConfigService;
-            _htmlWeb = new HtmlWeb();
+            _emailSender = emailSender;
             _webClient = new WebClient();
         }
 
@@ -29,27 +30,22 @@ namespace ProductScraper.Services.Implementations
             if (configs.Any())
             {
                 if (configs.Count > 1)
-                {
-                    //Alert if more than one config exists for current url
-                    //Do not throw error, just send an email to the admin and continue processing with the last one                    
-                }
+                    SendEmailToAdmin("Duplicate condifuration", $"For url {product.URL} there are multiple configurations!");
+
                 Scrape(configs.FirstOrDefault(), product);
             }
             else
             {
-                //Alert if more no config exists so it should be added
-                throw new ScrapeServiceException("Unsupported URL!");
+                SendEmailToAdmin("Missing condifuration", $"Missing configuration for URL: {product.URL}, UserProfileId: {product.UserProfileId}");                
+                throw new ScrapeServiceException("Sorry, currently we don't support this URL, as soon as we support it, we will let you know.");
             }
         }
 
-        public void Scrape(ScrapeConfig scrapeConfig, ProductInfo product)
+        private void Scrape(ScrapeConfig scrapeConfig, ProductInfo product)
         {
-            bool hasError = false;
-
             if (string.IsNullOrWhiteSpace(product.URL))
                 throw new Exception("URL can not be empty!");
 
-            
             string html = _webClient.DownloadString(product.URL);
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(html);
@@ -67,8 +63,8 @@ namespace ProductScraper.Services.Implementations
             }
             catch (Exception ex)
             {
+                SendEmailToAdmin("ScrapServiceException", ex.Message);
                 //Log the exception
-                hasError = true;
             }
 
             try
@@ -82,8 +78,8 @@ namespace ProductScraper.Services.Implementations
             }
             catch (Exception ex)
             {
+                SendEmailToAdmin("ScrapServiceException", ex.Message);
                 //Log the exception
-                hasError = true;
             }
 
 
@@ -98,8 +94,8 @@ namespace ProductScraper.Services.Implementations
             }
             catch (Exception ex)
             {
+                SendEmailToAdmin("ScrapServiceException", ex.Message);
                 //Log the exception
-                hasError = true;
             }
 
             try
@@ -140,11 +136,29 @@ namespace ProductScraper.Services.Implementations
             }
             catch (Exception ex)
             {
+                SendEmailToAdmin("ScrapServiceException", ex.Message);
                 //Log the exception
-                hasError = true;
             }
-
             product.LastCheckedOn = DateTime.UtcNow;
+
+            if (product.HasChangesSinceLastTime)
+            {
+                NotifyUserAboutChanges(product);
+            }
+        }
+
+        private void NotifyUserAboutChanges(ProductInfo product)
+        {
+            var userId = product.UserProfile.UserId;
+            var msg = new EmailMessage("stevcooo@gmail.com", $"Changes in your product {product.Name}", 
+                $"The product {product.Name} has changes. You can check them on this link: {product.URL}");
+            _emailSender.SendEmail(msg);
+        }
+
+        private void SendEmailToAdmin(string subject, string content)
+        {
+            var msg = new EmailMessage("stevcooo@gmail.com", subject, content);
+            _emailSender.SendEmail(msg);
         }
     }
 }
