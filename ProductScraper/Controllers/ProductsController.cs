@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Services.Exceptions;
 using ProductScraper.Services.Interfaces;
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -26,7 +27,7 @@ namespace ProductScraper.Controllers
         }
 
         // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(long? id)
         {
             if (id == null)
             {
@@ -43,7 +44,7 @@ namespace ProductScraper.Controllers
         }
 
         // GET: Products/Check
-        public async Task<IActionResult> Check(int? id)
+        public async Task<IActionResult> Check(long? id)
         {
             if (id == null)
             {
@@ -73,6 +74,8 @@ namespace ProductScraper.Controllers
                 var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 try
                 {
+                    productInfo.Id = DateTime.Now.Ticks;
+                    productInfo.RowKey = productInfo.Id.ToString();
                     await _productInfoService.AddAsync(_userId, productInfo);
                 }
                 catch (ScrapeServiceException exception)
@@ -86,7 +89,7 @@ namespace ProductScraper.Controllers
         }
 
         // GET: Products/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(long? id)
         {
             if (id == null)
             {
@@ -106,7 +109,7 @@ namespace ProductScraper.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,URL")] ProductInfo productInfo)
+        public async Task<IActionResult> Edit(long id, [Bind("Id,URL")] ProductInfo productInfo)
         {
             if (id != productInfo.Id)
             {
@@ -118,6 +121,7 @@ namespace ProductScraper.Controllers
                 var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 try
                 {
+                    productInfo.RowKey = productInfo.Id.ToString();
                     await _productInfoService.UpdateAsync(_userId, productInfo);
                 }
                 catch (ScrapeServiceException exception)
@@ -131,7 +135,7 @@ namespace ProductScraper.Controllers
         }
 
         // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(long? id)
         {
             if (id == null)
             {
@@ -150,7 +154,7 @@ namespace ProductScraper.Controllers
         // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             await _productInfoService.DeleteAsync(_userId, id);

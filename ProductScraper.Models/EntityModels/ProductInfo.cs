@@ -20,9 +20,7 @@ namespace ProductScraper.Models.EntityModels
         public virtual int UserProfileId { get; set; }
 
         public ProductInfo()
-        {
-            Id = DateTime.Now.Ticks;
-            RowKey = Id.ToString();
+        {            
             LastCheckedOn = DateTime.Now;
         }
     }

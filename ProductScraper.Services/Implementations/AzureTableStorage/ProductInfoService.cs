@@ -20,14 +20,14 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
             await _repository.Insert(productInfo);
         }
 
-        public Task CheckAsync(string userId, int id)
+        public Task CheckAsync(string userId, long id)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task DeleteAsync(string userId, int id)
+        public async Task DeleteAsync(string userId, long id)
         {
-            throw new System.NotImplementedException();
+            await _repository.Delete(userId, id.ToString());
         }
 
         public async Task<IList<ProductInfo>> GetAllAsync(string userId)
@@ -35,14 +35,15 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
             return await _repository.GetList(userId);
         }
 
-        public Task<ProductInfo> GetDetailsAsync(string userId, int id)
+        public async Task<ProductInfo> GetDetailsAsync(string userId, long id)
         {
-            throw new System.NotImplementedException();
+            return await _repository.GetItem(userId, id.ToString());            
         }
 
-        public Task UpdateAsync(string userId, ProductInfo productInfo)
+        public async Task UpdateAsync(string userId, ProductInfo productInfo)
         {
-            throw new System.NotImplementedException();
+            productInfo.PartitionKey = userId;
+            await _repository.Update(productInfo);            
         }
     }
 }

@@ -26,7 +26,7 @@ namespace ProductScraper.Services.Implementations
                 .Where(m => m.UserProfile.UserId == userId).ToListAsync();
         }
 
-        public async Task<ProductInfo> GetDetailsAsync(string userId, int id)
+        public async Task<ProductInfo> GetDetailsAsync(string userId, long id)
         {
             return await _context.ProductInfos
                 .Include(p => p.UserProfile)
@@ -71,7 +71,7 @@ namespace ProductScraper.Services.Implementations
             }
         }
 
-        public async Task DeleteAsync(string userId, int id)
+        public async Task DeleteAsync(string userId, long id)
         {
             var productInfo = await _context.ProductInfos
                 .Include(p => p.UserProfile)
@@ -83,7 +83,7 @@ namespace ProductScraper.Services.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task CheckAsync(string userId, int id)
+        public async Task CheckAsync(string userId, long id)
         {
             var productInfo = await _context.ProductInfos
                 .Include(p => p.UserProfile)
