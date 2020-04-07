@@ -110,7 +110,7 @@ namespace ProductScraper.Services.Implementations
             }
         }
 
-        private bool Exists(int id)
+        private bool Exists(long id)
         {
             return _context.ProductInfos.Any(e => e.Id == id);
         }

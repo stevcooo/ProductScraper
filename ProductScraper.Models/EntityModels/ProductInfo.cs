@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProductScraper.Models.EntityModels
 {
-    public class ProductInfo
+    public class ProductInfo : AzureTableEntity
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; }        
         [Required]
         [Url]
@@ -18,5 +18,12 @@ namespace ProductScraper.Models.EntityModels
 
         public virtual UserProfile UserProfile { get; set; }
         public virtual int UserProfileId { get; set; }
+
+        public ProductInfo()
+        {
+            Id = DateTime.Now.Ticks;
+            RowKey = Id.ToString();
+            LastCheckedOn = DateTime.Now;
+        }
     }
 }

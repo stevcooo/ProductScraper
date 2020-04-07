@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProductScraper.Models\ProductScraper.Models.csproj" />
+    <ProjectReference Include="..\ProductScraper.Services\ProductScraper.Services.csproj" />
   </ItemGroup>
 
 </Project>
