@@ -1,0 +1,66 @@
+﻿@model ProductScraper.Models.EntityModels.ScrapeConfig
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h3>Create Configuration</h3>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label>Name</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Link</label>                
+                <input asp-for="URL" class="form-control" />
+                <span asp-validation-for="URL" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Product name xPath</label>
+                <input asp-for="ProductNamePath" class="form-control" />
+                <span asp-validation-for="ProductNamePath" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Product price xPath</label>
+                <input asp-for="ProductPricePath" class="form-control" />
+                <span asp-validation-for="ProductPricePath" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Product second price xPath</label>
+                <input asp-for="ProductSecondPricePath" class="form-control" />
+                <span asp-validation-for="ProductSecondPricePath" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Product availability xPath</label>
+                <input asp-for="ProductAvailabilityPath" class="form-control" />
+                <span asp-validation-for="ProductAvailabilityPath" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Product availability value xPath</label>                
+                <input asp-for="ProductAvailabilityValue" class="form-control" />
+                <span asp-validation-for="ProductAvailabilityValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Is Product availability value an atribute</label>                
+                <input asp-for="ProductAvailabilityIsAtributeValue" class="form-control" />
+                <span asp-validation-for="ProductAvailabilityIsAtributeValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

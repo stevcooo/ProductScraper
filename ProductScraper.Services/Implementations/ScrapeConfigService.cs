@@ -22,7 +22,7 @@ namespace ProductScraper.Services.Implementations
             return await _context.ScrapeConfigs.ToListAsync();
         }
 
-        public async Task<ScrapeConfig> GetDetailsAsync(int id)
+        public async Task<ScrapeConfig> GetDetailsAsync(long id)
         {
             return await _context.ScrapeConfigs.FirstOrDefaultAsync(t=>t.Id == id);
         }
@@ -53,7 +53,7 @@ namespace ProductScraper.Services.Implementations
             }
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(long id)
         {
             var item = await _context.ScrapeConfigs
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -64,7 +64,7 @@ namespace ProductScraper.Services.Implementations
             await _context.SaveChangesAsync();
         }
 
-        private bool Exists(int id)
+        private bool Exists(long id)
         {
             return _context.ScrapeConfigs.Any(e => e.Id == id);
         }

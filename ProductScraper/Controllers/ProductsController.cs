@@ -74,8 +74,6 @@ namespace ProductScraper.Controllers
                 var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 try
                 {
-                    productInfo.Id = DateTime.Now.Ticks;
-                    productInfo.RowKey = productInfo.Id.ToString();
                     await _productInfoService.AddAsync(_userId, productInfo);
                 }
                 catch (ScrapeServiceException exception)
@@ -121,7 +119,6 @@ namespace ProductScraper.Controllers
                 var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 try
                 {
-                    productInfo.RowKey = productInfo.Id.ToString();
                     await _productInfoService.UpdateAsync(_userId, productInfo);
                 }
                 catch (ScrapeServiceException exception)

@@ -1,8 +1,8 @@
 ﻿namespace ProductScraper.Models.EntityModels
 {
-    public class ScrapeConfig
+    public class ScrapeConfig : AzureTableEntity
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; }
         public string URL { get; set; }
         public string ProductNamePath { get; set; }

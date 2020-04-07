@@ -63,6 +63,15 @@ namespace samplemvccore4
             });
 
             services.AddScoped<IProductInfoService, ProductInfoService>();
+
+            services.AddScoped<IAzureTableStorage<ScrapeConfig>>(factory =>
+            {
+                return new AzureTableStorage<ScrapeConfig>(
+                    new AzureTableSettings(
+                        storageConnectionString: Configuration.GetSection("AzureTable:StorageConnectionString").Value,
+                        tableName: Configuration.GetSection("AzureTable:ScrapeConfigTableName").Value));
+            });
+            services.AddScoped<IScrapeConfigService, ScrapeConfigService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,5 +1,6 @@
 ﻿using ProductScraper.Models.EntityModels;
 using ProductScraper.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -16,6 +17,8 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
 
         public async Task AddAsync(string userId, ProductInfo productInfo)
         {
+            productInfo.Id = DateTime.Now.Ticks;
+            productInfo.RowKey = productInfo.Id.ToString();
             productInfo.PartitionKey = userId;
             await _repository.Insert(productInfo);
         }
@@ -42,6 +45,7 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
 
         public async Task UpdateAsync(string userId, ProductInfo productInfo)
         {
+            productInfo.RowKey = productInfo.Id.ToString();
             productInfo.PartitionKey = userId;
             await _repository.Update(productInfo);            
         }

@@ -1,0 +1,59 @@
+﻿@model ProductScraper.Models.EntityModels.ScrapeConfig
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h3>Details</h3>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            <label>Name</label>
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-3">
+            <label>Link</label>
+        </dt>
+        <dd class="col-sm-9">
+            <a target="_blank" href="@Model.URL">@Model.URL</a>
+        </dd>
+        <dt class="col-sm-3">
+            <label>Product name xPath</label>
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ProductNamePath)
+        </dd>
+        <dt class="col-sm-3">
+            <label>Product price xPath</label>
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ProductPricePath)
+        </dd>
+        <dt class="col-sm-3">
+            <label>Product second price xPath</label>
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ProductSecondPricePath)
+        </dd>
+        <dt class="col-sm-3">
+            <label>Product availability xPath</label>
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ProductAvailabilityPath)
+        </dd>
+        <dt class="col-sm-3">
+            <label>Product availability value xPath</label>
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ProductAvailabilityValue)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
