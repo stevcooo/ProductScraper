@@ -17,6 +17,8 @@ namespace ProductScraper.Areas.Identity.Pages.Account.Manage
         public static string ExternalLogins => "ExternalLogins";
 
         public static string PersonalData => "PersonalData";
+        public static string EmailNotificationsSettings => "EmailNotificationsSettings";
+        
 
         public static string TwoFactorAuthentication => "TwoFactorAuthentication";
 
@@ -29,6 +31,7 @@ namespace ProductScraper.Areas.Identity.Pages.Account.Manage
         public static string ExternalLoginsNavClass(ViewContext viewContext) => PageNavClass(viewContext, ExternalLogins);
 
         public static string PersonalDataNavClass(ViewContext viewContext) => PageNavClass(viewContext, PersonalData);
+        public static string EmailNotificationsSettingsNavClass(ViewContext viewContext) => PageNavClass(viewContext, EmailNotificationsSettings);
 
         public static string TwoFactorAuthenticationNavClass(ViewContext viewContext) => PageNavClass(viewContext, TwoFactorAuthentication);
 

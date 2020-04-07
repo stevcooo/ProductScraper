@@ -1,0 +1,21 @@
+﻿@page
+@model EmailNotificationsSettings
+@{
+    ViewData["Title"] = "Email notifications";
+    ViewData["ActivePage"] = ManageNavPages.EmailNotificationsSettings;
+}
+
+<h4>@ViewData["Title"]</h4>
+
+<div class="row">
+    <div class="col-md-10">
+        <p>We can send you an email every time when some of your products have changed price or availability.</p>
+        <p>Please choose your preferences on how often you want us to check for product changes.</p>
+        <p>Should we send you an email when there is no change?</p>
+        <button id="save-notification-settings-button" type="submit" class="btn btn-primary">Save</button>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
