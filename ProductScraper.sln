@@ -10,8 +10,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductScraper.Models", "ProductScraper.Models\ProductScraper.Models.csproj", "{85851D59-DB02-4720-B3A9-1078A6A8C06D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductScraper", "ProductScraper\ProductScraper.csproj", "{01E4A819-6371-4E4B-86A6-D7E975693975}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1F32353-03DB-4E80-9DD2-9856160B9981} = {B1F32353-03DB-4E80-9DD2-9856160B9981}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductScraper.Functions", "ProductScraper.Functions\ProductScraper.Functions.csproj", "{B1F32353-03DB-4E80-9DD2-9856160B9981}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductScraper.Functions", "ProductScraper.Functions\ProductScraper.Functions.csproj", "{B1F32353-03DB-4E80-9DD2-9856160B9981}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

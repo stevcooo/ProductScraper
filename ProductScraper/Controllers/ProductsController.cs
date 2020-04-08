@@ -52,7 +52,6 @@ namespace ProductScraper.Controllers
             }
             var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             await _productInfoService.CheckAsync(_userId, id.Value);
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -75,6 +74,7 @@ namespace ProductScraper.Controllers
                 try
                 {
                     await _productInfoService.AddAsync(_userId, productInfo);
+                    await _productInfoService.CheckAsync(_userId, productInfo.Id);
                 }
                 catch (ScrapeServiceException exception)
                 {
@@ -120,6 +120,7 @@ namespace ProductScraper.Controllers
                 try
                 {
                     await _productInfoService.UpdateAsync(_userId, productInfo);
+                    await _productInfoService.CheckAsync(_userId, productInfo.Id);
                 }
                 catch (ScrapeServiceException exception)
                 {

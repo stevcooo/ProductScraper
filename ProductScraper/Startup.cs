@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProductScraper.Data;
+using ProductScraper.Models;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.ViewModels;
 using ProductScraper.Services.Implementations.AzureTableStorage;
@@ -53,6 +54,8 @@ namespace ProductScraper
             //.AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
             services.AddScoped<IAzureTableStorage<ProductInfo>>(factory =>
             {
