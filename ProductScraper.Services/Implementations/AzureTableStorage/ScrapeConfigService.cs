@@ -20,7 +20,7 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
         {
             scrapeConfig.Id = DateTime.Now.Ticks;
             scrapeConfig.RowKey = scrapeConfig.Id.ToString();
-            scrapeConfig.PartitionKey = PARTITION_KEY;
+            scrapeConfig.PartitionKey = PARTITION_KEY;            
             await _repository.Insert(scrapeConfig);
         }
 

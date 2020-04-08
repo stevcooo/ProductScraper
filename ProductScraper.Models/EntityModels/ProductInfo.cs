@@ -17,7 +17,7 @@ namespace ProductScraper.Models.EntityModels
         public bool HasChangesSinceLastTime { get; set; }
 
         public virtual UserProfile UserProfile { get; set; }
-        public virtual int UserProfileId { get; set; }
+        public virtual long UserProfileId { get; set; }
 
         public ProductInfo()
         {            

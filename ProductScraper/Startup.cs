@@ -13,7 +13,7 @@ using ProductScraper.Services.Interfaces;
 using System;
 using IdentityUser = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityUser;
 
-namespace samplemvccore4
+namespace ProductScraper
 {
     public class Startup
     {
@@ -72,6 +72,15 @@ namespace samplemvccore4
                         tableName: Configuration.GetSection("AzureTable:ScrapeConfigTableName").Value));
             });
             services.AddScoped<IScrapeConfigService, ScrapeConfigService>();
+
+            services.AddScoped<IAzureTableStorage<UserProfile>>(factory =>
+            {
+                return new AzureTableStorage<UserProfile>(
+                    new AzureTableSettings(
+                        storageConnectionString: Configuration.GetSection("AzureTable:StorageConnectionString").Value,
+                        tableName: Configuration.GetSection("AzureTable:UserProfileTableName").Value));
+            });
+            services.AddScoped<IUserProfileService, UserProfileService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

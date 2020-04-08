@@ -1,24 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using ProductScraper.Services.Interfaces;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using IdentityUser = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityUser;
 
 namespace ProductScraper.Areas.Identity.Pages.Account.Manage
 {
     public partial class IndexModel : PageModel
     {
+        private readonly IUserProfileService _userProfileService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
         public IndexModel(
+            IUserProfileService userProfileService,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager)
         {
+            _userProfileService = userProfileService;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -33,6 +35,14 @@ namespace ProductScraper.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
+            [Required]
+            [Display(Name = "First name")]
+            public string FirstName { get; set; }
+
+            [Required]
+            [Display(Name = "Last name")]
+            public string LastName { get; set; }
+
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
@@ -42,12 +52,14 @@ namespace ProductScraper.Areas.Identity.Pages.Account.Manage
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
+            var userProfile = await _userProfileService.GetByUserId(user.Id);
             Username = userName;
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                FirstName = userProfile.FirstName,
+                LastName = userProfile.LastName
             };
         }
 
@@ -86,6 +98,13 @@ namespace ProductScraper.Areas.Identity.Pages.Account.Manage
                     var userId = await _userManager.GetUserIdAsync(user);
                     throw new InvalidOperationException($"Unexpected error occurred setting phone number for user with ID '{userId}'.");
                 }
+            }
+            var userProfile = await _userProfileService.GetByUserId(user.Id);
+            if (userProfile != null)
+            {
+                userProfile.FirstName = Input.FirstName;
+                userProfile.LastName = Input.LastName;
+                await _userProfileService.UpdateAsync(userProfile);
             }
 
             await _signInManager.RefreshSignInAsync(user);

@@ -13,8 +13,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using ProductScraper.Models.EntityModels;
+using ProductScraper.Services.Implementations.AzureTableStorage;
+using ProductScraper.Services.Interfaces;
 using IdentityUser = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityUser;
-
+using IEmailSender = Microsoft.AspNetCore.Identity.UI.Services.IEmailSender;
 namespace ProductScraper.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
@@ -24,8 +27,10 @@ namespace ProductScraper.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IUserProfileService _userProfileService;
 
         public RegisterModel(
+            IUserProfileService userProfileService,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
@@ -35,6 +40,7 @@ namespace ProductScraper.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _userProfileService = userProfileService;
         }
 
         [BindProperty]
@@ -80,6 +86,12 @@ namespace ProductScraper.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    var userProfile = new UserProfile
+                    {
+                        UserId = user.Id
+                    };
+                    await _userProfileService.AddAsync(userProfile);
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

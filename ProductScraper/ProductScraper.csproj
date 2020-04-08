@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UserSecretsId>aspnet-samplemvccore4-20314330-701E-46B0-A493-E5980C58E016</UserSecretsId>
+    <UserSecretsId>aspnet-ProductScraper-20314330-701E-46B0-A493-E5980C58E016</UserSecretsId>
   </PropertyGroup>
 
 
@@ -17,6 +17,14 @@
   <ItemGroup>
     <ProjectReference Include="..\ProductScraper.Models\ProductScraper.Models.csproj" />
     <ProjectReference Include="..\ProductScraper.Services\ProductScraper.Services.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Content Update="Areas\Identity\Pages\Account\Manage\Index.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
