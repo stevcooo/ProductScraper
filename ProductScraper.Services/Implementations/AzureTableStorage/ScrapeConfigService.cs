@@ -1,4 +1,5 @@
 ﻿using ProductScraper.Models.EntityModels;
+using ProductScraper.Models.Extensions;
 using ProductScraper.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,6 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
     public class ScrapeConfigService : IScrapeConfigService
     {
         private readonly IAzureTableStorage<ScrapeConfig> _repository;
-        private const string PARTITION_KEY = "ScrapeConfig";
 
         public ScrapeConfigService(IAzureTableStorage<ScrapeConfig> repository)
         {
@@ -20,29 +20,29 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
         {
             scrapeConfig.Id = DateTime.Now.Ticks;
             scrapeConfig.RowKey = scrapeConfig.Id.ToString();
-            scrapeConfig.PartitionKey = PARTITION_KEY;            
+            scrapeConfig.PartitionKey = scrapeConfig.URL.ToCoreUrl();
             await _repository.Insert(scrapeConfig);
         }
 
         public async Task DeleteAsync(long id)
         {
-            await _repository.Delete(PARTITION_KEY, id.ToString());
+            throw new System.NotImplementedException();
         }
 
         public async Task<IList<ScrapeConfig>> GetAllAsync()
         {
-            return await _repository.GetList(PARTITION_KEY);
+            return await _repository.GetList();
         }
 
         public async Task<ScrapeConfig> GetDetailsAsync(long id)
         {
-            return await _repository.GetItem(PARTITION_KEY, id.ToString());
+            throw new System.NotImplementedException();
         }
 
         public async Task UpdateAsync(ScrapeConfig scrapeConfig)
         {
             scrapeConfig.RowKey = scrapeConfig.Id.ToString();
-            scrapeConfig.PartitionKey = PARTITION_KEY;
+            scrapeConfig.PartitionKey = scrapeConfig.URL.ToCoreUrl();
             await _repository.Update(scrapeConfig);            
         }
     }
