@@ -32,7 +32,8 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
         public async Task CheckAsync(string userId, long id)
         {
             var Url = _settings.Value.AzureFunctionURL;
-            Url += $"/{userId}/{id}";
+            Url += $"ScrapeProduct/{userId}/{id}";
+            Url += _settings.Value.AzureFunctionCode;
 
             CancellationToken cancellationToken;
 

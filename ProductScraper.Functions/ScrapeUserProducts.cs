@@ -60,8 +60,6 @@ namespace ProductScraper.Functions
                         //Add to Email
                         emailBodyBoulder.AppendLine($"{product.Name} Price: {product.Price} / {product.SecondPrice} Availability: {product.Availability} CheckedOn: {product.LastCheckedOn}");                        
                     }
-
-
                 }
                 else
                 {

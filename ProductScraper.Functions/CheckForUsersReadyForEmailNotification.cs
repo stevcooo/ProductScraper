@@ -25,6 +25,13 @@ namespace ProductScraper.Functions
                 if (timeSpan.Days >= user.DaysBetweenEmailNotifications)
                 {
                     log.LogInformation($"User {user.Id} is ready for notifications.");
+
+                    //Update user info
+                    user.LastNotificationEmailSendOn = DateTime.UtcNow;                    
+                    var operation = TableOperation.InsertOrReplace(user);
+                    await userProfileTable.ExecuteAsync(operation);
+
+                    //Send notification to queue
                     await usersReadyForNotificationsQueue.AddAsync(user);                    
                 }
             }
