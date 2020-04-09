@@ -25,7 +25,7 @@ namespace ProductScraper.Services.Implementations
         {
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress(_emailConfig.From));
-            emailMessage.To.AddRange(message.To.Select(x => new MailboxAddress(x)));
+            emailMessage.To.Add(new MailboxAddress(message.To));
             emailMessage.Subject = message.Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
 

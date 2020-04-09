@@ -1,8 +1,5 @@
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
 using ProductScraper.Models.EntityModels;
@@ -11,68 +8,76 @@ using ProductScraper.Models.ViewModels;
 using System;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
+using System.Text;
 
 namespace ProductScraper.Functions
 {
-    public static class ScrapeProduct
+    public static class ScrapeUserProducts
     {
         static WebClient _webClient = new WebClient();
 
-        [FunctionName("ScrapeProduct")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "ScrapeProduct/{userId}/{productId}")] HttpRequest req,
-            [Table("ProductInfo", "{userId}")] CloudTable productInfoTable,
-            [Table("ScrapeConfig")] CloudTable scrapeConfigTable,
-            [Queue("ChnagedProducts")] IAsyncCollector<ProductInfo> changedProductQueue,
+        [FunctionName("ScrapeUserProducts")]
+        public static async void Run(
+            [QueueTrigger("usersReadyForNotifications", Connection = "AzureWebJobsStorage")]UserProfile userProfile,
             [Queue("ProductUpdateEmailNotifications")] IAsyncCollector<EmailMessage> emailMessageQueue,
-            string userId,
-            string productId,
+            IBinder binder,
             ILogger log)
         {
-            log.LogInformation($"Request to scrape product {productId}");
-            var productQuery = new TableQuery<ProductInfo>().Where(
-                TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, productId));
-            var products = await productInfoTable.ExecuteQuerySegmentedAsync(productQuery, null);
-            if (products != null && products.Count() == 1)
+            log.LogInformation($"C# Queue trigger function processed: {userProfile.FirstName}");
+            
+            var productInfoTable = await binder.BindAsync<CloudTable>(new TableAttribute("ProductInfo", userProfile.UserId)
             {
-                //Find matching criteria
-                var product = products.First();
-                var configQuery = new TableQuery<ScrapeConfig>().Where(
-                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, product.URL.ToCoreUrl()));
+                Connection = "AzureWebJobsStorage"
+            });
 
-                var configs = await scrapeConfigTable.ExecuteQuerySegmentedAsync(configQuery, null);
-                if (configs != null && configs.Count() == 1)
+            var scrapeConfigTable = await binder.BindAsync<CloudTable>(new TableAttribute("ScrapeConfig")
+            {
+                Connection = "AzureWebJobsStorage"
+            });
+
+            var productQuery = new TableQuery<ProductInfo>();
+            var userProducts = await productInfoTable.ExecuteQuerySegmentedAsync(productQuery, null);
+
+            //Load all configs in the begginign/maybe this should be changed in the future
+            var configsQuery = new TableQuery<ScrapeConfig>();
+            var allConfigs = await scrapeConfigTable.ExecuteQuerySegmentedAsync(configsQuery, null);
+
+            EmailMessage emailMessage;
+            StringBuilder emailBodyBoulder = new StringBuilder();
+            foreach (var product in userProducts)
+            {
+                //Find config from allConfigs
+                var config = allConfigs.FirstOrDefault(t => t.PartitionKey.Equals(product.URL.ToCoreUrl()));
+
+                if (config != null)
                 {
-                    Scrape(configs.First(), product, log);
-                    
+                    Scrape(config, product, log);
                     //Update product in db
-                    var operation = TableOperation.InsertOrReplace(product);                    
+                    var operation = TableOperation.InsertOrReplace(product);
                     await productInfoTable.ExecuteAsync(operation);
-                    
                     if (product.HasChangesSinceLastTime)
                     {
-                        await changedProductQueue.AddAsync(product);
+                        //Add to Email
+                        emailBodyBoulder.AppendLine($"{product.Name} Price: {product.Price} / {product.SecondPrice} Availability: {product.Availability} CheckedOn: {product.LastCheckedOn}");                        
                     }
 
-                    /*
-                    var emailMessage = new EmailMessage(userId, "Products updates", "Testing scenario!");
-                    await emailMessageQueue.AddAsync(emailMessage);
-                    */
+
                 }
                 else
                 {
                     log.LogInformation($"Multiple scrape config matches the criteria URL={product.URL}");
                 }
             }
+            if (emailBodyBoulder.Length > 0)
+            {
+                emailMessage = new EmailMessage(userProfile.UserId, "Products updates", emailBodyBoulder.ToString());
+            }
             else
             {
-                log.LogInformation($"Multiple products matches the criteria userId={userId} productId={productId}");
+                emailMessage = new EmailMessage(userProfile.UserId, "Products updates", "None of your products has been updated/changed since last check.");
             }
-
-            string responseMessage = string.IsNullOrEmpty(productId)
-                ? "Please provide productId in the path" : $"Product {productId} has been scraped";
-            return new OkObjectResult(responseMessage);
+            //Send message to the queue
+            await emailMessageQueue.AddAsync(emailMessage);
         }
 
         private static void Scrape(ScrapeConfig scrapeConfig, ProductInfo product, ILogger log)
