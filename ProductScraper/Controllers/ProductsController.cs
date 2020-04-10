@@ -107,7 +107,7 @@ namespace ProductScraper.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("Id,URL")] ProductInfo productInfo)
+        public async Task<IActionResult> Edit(long id, [Bind("Id,PartitionKey,RowKey,URL")] ProductInfo productInfo)
         {
             if (id != productInfo.Id)
             {

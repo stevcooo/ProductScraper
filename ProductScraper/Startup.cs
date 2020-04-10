@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using ProductScraper.Data;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.ViewModels;
+using ProductScraper.Services.Implementations;
 using ProductScraper.Services.Implementations.AzureTableStorage;
 using ProductScraper.Services.Interfaces;
 using System;
@@ -72,7 +73,7 @@ namespace ProductScraper
                         tableName: Configuration.GetSection("AzureTable:ProductInfoTableName").Value));
             });
 
-            services.AddScoped<IProductInfoService, ProductInfoService>();
+            services.AddScoped<IProductInfoService, Services.Implementations.AzureTableStorage.ProductInfoService>();
 
             services.AddScoped<IAzureTableStorage<ScrapeConfig>>(factory =>
             {
@@ -81,7 +82,7 @@ namespace ProductScraper
                         storageConnectionString: Configuration.GetSection("AzureTable:StorageConnectionString").Value,
                         tableName: Configuration.GetSection("AzureTable:ScrapeConfigTableName").Value));
             });
-            services.AddScoped<IScrapeConfigService, ScrapeConfigService>();
+            services.AddScoped<IScrapeConfigService, Services.Implementations.AzureTableStorage.ScrapeConfigService>();
 
             services.AddScoped<IAzureTableStorage<UserProfile>>(factory =>
             {
@@ -91,6 +92,8 @@ namespace ProductScraper
                         tableName: Configuration.GetSection("AzureTable:UserProfileTableName").Value));
             });
             services.AddScoped<IUserProfileService, UserProfileService>();
+            
+            services.AddScoped<IHttpHandlerService, HttpHandlerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

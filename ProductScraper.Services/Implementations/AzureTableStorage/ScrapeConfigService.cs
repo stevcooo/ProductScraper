@@ -3,12 +3,9 @@ using ProductScraper.Common;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.Extensions;
 using ProductScraper.Models.ViewModels;
-using ProductScraper.Services.Helpers;
 using ProductScraper.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ProductScraper.Services.Implementations.AzureTableStorage
@@ -17,11 +14,15 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
     {
         private readonly IAzureTableStorage<ScrapeConfig> _repository;
         private readonly IOptions<AppSettings> _settings;
+        private readonly IHttpHandlerService _httpHandlerService;
 
-        public ScrapeConfigService(IOptions<AppSettings> settings, IAzureTableStorage<ScrapeConfig> repository)
+        public ScrapeConfigService(IOptions<AppSettings> settings, 
+            IAzureTableStorage<ScrapeConfig> repository,
+            IHttpHandlerService httpHandlerService)
         {
             _repository = repository;
             _settings = settings;
+            _httpHandlerService = httpHandlerService;
         }
 
         public async Task AddAsync(ScrapeConfig scrapeConfig)
@@ -30,29 +31,20 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
             scrapeConfig.RowKey = scrapeConfig.Id.ToString();
             scrapeConfig.PartitionKey = scrapeConfig.URL.ToCoreUrl();
             
-            CancellationToken cancellationToken;
             var url = _settings.Value.AzureFunctionURL + FunctionsNames.AddScrapeConfig + "/" + _settings.Value.AzureFunctionCode;
-            using var client = new HttpClient();
-            using var request = new HttpRequestMessage(HttpMethod.Post, url);
-            using var httpContent = HttpContentHelper.Create(scrapeConfig);
-            request.Content = httpContent;
-
-            using var response = await client
-                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-                .ConfigureAwait(false);
-
-            if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                throw new Exception(await response.Content.ReadAsStringAsync());
+            await _httpHandlerService.HandlePostRequest(url, scrapeConfig);
         }
 
         public async Task DeleteAsync(string partitionKey, string rowKey)
         {
-            await _repository.Delete(partitionKey, rowKey);
+            var url = _settings.Value.AzureFunctionURL + FunctionsNames.DeleteScrapeConfig + $"/{partitionKey}/{rowKey}/" + _settings.Value.AzureFunctionCode;
+            await _httpHandlerService.HandlePostRequest(url, null);
         }
 
         public async Task<IList<ScrapeConfig>> GetAllAsync()
         {
-            return await _repository.GetList();
+            var url = _settings.Value.AzureFunctionURL + FunctionsNames.GetAllScrapeConfigs + "/" + _settings.Value.AzureFunctionCode;
+            return await _httpHandlerService.HandleGetRequest<IList<ScrapeConfig>>(url);
         }
 
         public async Task<ScrapeConfig> GetDetailsAsync(string partitionKey, string rowKey)
@@ -62,9 +54,8 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
 
         public async Task UpdateAsync(ScrapeConfig scrapeConfig)
         {
-            scrapeConfig.RowKey = scrapeConfig.Id.ToString();
-            scrapeConfig.PartitionKey = scrapeConfig.URL.ToCoreUrl();
-            await _repository.Update(scrapeConfig);            
+            var url = _settings.Value.AzureFunctionURL + FunctionsNames.UpdateScrapeConfig + "/" + _settings.Value.AzureFunctionCode;
+            await _httpHandlerService.HandlePostRequest(url, scrapeConfig);
         }
     }
 }
