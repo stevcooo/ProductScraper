@@ -4,7 +4,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using ProductScraper.Models.EntityModels;
 using System;
 
-namespace ProductScraper.Functions
+namespace ProductScraper.Functions.EmailNotificationsFunctions
 {
     public static class CheckForUsersReadyForEmailNotification
     {

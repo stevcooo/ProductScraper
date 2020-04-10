@@ -5,7 +5,7 @@ using ProductScraper.Models.ViewModels;
 using SendGrid.Helpers.Mail;
 using System.Linq;
 
-namespace ProductScraper.Functions
+namespace ProductScraper.Functions.EmailNotificationsFunctions
 {
     public static class GenerateProductUpdateEmail
     {

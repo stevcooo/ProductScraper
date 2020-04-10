@@ -2,7 +2,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using SendGrid.Helpers.Mail;
 
-namespace ProductScraper.Functions
+namespace ProductScraper.Functions.EmailNotificationsFunctions
 {
     public static class EmailSender
     {

@@ -10,7 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace ProductScraper.Functions
+namespace ProductScraper.Functions.ScrapeFunctions
 {
     public static class ScrapeUserProducts
     {
