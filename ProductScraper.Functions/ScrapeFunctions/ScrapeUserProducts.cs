@@ -69,13 +69,13 @@ namespace ProductScraper.Functions.ScrapeFunctions
             if (emailBodyBoulder.Length > 0)
             {
                 emailMessage = new EmailMessage(userProfile.UserId, "Products updates", emailBodyBoulder.ToString());
+                await emailMessageQueue.AddAsync(emailMessage);
             }
-            else
+            else if(userProfile.SendEmailWhenNoProductHasBeenChanged)
             {
                 emailMessage = new EmailMessage(userProfile.UserId, "Products updates", "None of your products has been updated/changed since last check.");
+                await emailMessageQueue.AddAsync(emailMessage);
             }
-            //Send message to the queue
-            await emailMessageQueue.AddAsync(emailMessage);
         }
 
         private static void Scrape(ScrapeConfig scrapeConfig, ProductInfo product, ILogger log)

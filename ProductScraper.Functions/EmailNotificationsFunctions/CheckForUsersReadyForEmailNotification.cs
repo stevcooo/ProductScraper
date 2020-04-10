@@ -21,6 +21,9 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
             var users = await userProfileTable.ExecuteQuerySegmentedAsync(userProfilesQuery, null);            
             foreach (var user in users)
             {
+                if (!user.EnableEmailNotifications)
+                    continue;
+
                 var timeSpan = DateTime.UtcNow - user.LastNotificationEmailSendOn;
                 if (timeSpan.Days >= user.DaysBetweenEmailNotifications)
                 {
