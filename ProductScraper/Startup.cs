@@ -18,9 +18,20 @@ namespace ProductScraper
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+
+            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(env.ContentRootPath)
+#if AZURE || RELEASE
+            .AddJsonFile($"appsettings.azure.json", optional: true)
+#else
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+#endif
+            .AddEnvironmentVariables();
+            Configuration = builder.Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -28,9 +39,6 @@ namespace ProductScraper
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //    options.UseSqlServer(
-            //        Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
@@ -41,7 +49,7 @@ namespace ProductScraper
             {
                 IdentityConfiguration idconfig = new IdentityConfiguration();
                 idconfig.TablePrefix = Configuration.GetSection("AzureTable:IdentityConfiguration:TablePrefix").Value;
-                idconfig.StorageConnectionString = Configuration.GetSection("AzureTable:IdentityConfiguration:StorageConnectionString").Value;
+                idconfig.StorageConnectionString = Configuration.GetSection("AzureTable:StorageConnectionString").Value;
                 idconfig.LocationMode = Configuration.GetSection("AzureTable:IdentityConfiguration:LocationMode").Value;
                 idconfig.IndexTableName = Configuration.GetSection("AzureTable:IdentityConfiguration:IndexTableName").Value; // default: AspNetIndex
                 idconfig.RoleTableName = Configuration.GetSection("AzureTable:IdentityConfiguration:RoleTableName").Value;   // default: AspNetRoles

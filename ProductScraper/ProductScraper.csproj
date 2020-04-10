@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>aspnet-ProductScraper-20314330-701E-46B0-A493-E5980C58E016</UserSecretsId>
+    <Configurations>Debug;Release;Azure</Configurations>
   </PropertyGroup>
 
 
