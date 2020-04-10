@@ -31,9 +31,9 @@
                 <a target="_blank" href="@item.URL">@item.URL</a>
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Edit" asp-route-partitionKey="@item.PartitionKey" asp-route-rowKey="@item.RowKey" >Edit</a> |
+                <a asp-action="Details" asp-route-partitionKey="@item.PartitionKey" asp-route-rowKey="@item.RowKey">Details</a> |
+                <a asp-action="Delete" asp-route-partitionKey="@item.PartitionKey" asp-route-rowKey="@item.RowKey">Delete</a>
             </td>
         </tr>
 }

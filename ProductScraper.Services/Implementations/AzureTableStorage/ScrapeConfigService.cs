@@ -24,9 +24,9 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
             await _repository.Insert(scrapeConfig);
         }
 
-        public async Task DeleteAsync(long id)
+        public async Task DeleteAsync(string partitionKey, string rowKey)
         {
-            throw new System.NotImplementedException();
+            await _repository.Delete(partitionKey, rowKey);
         }
 
         public async Task<IList<ScrapeConfig>> GetAllAsync()
@@ -34,9 +34,9 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
             return await _repository.GetList();
         }
 
-        public async Task<ScrapeConfig> GetDetailsAsync(long id)
+        public async Task<ScrapeConfig> GetDetailsAsync(string partitionKey, string rowKey)
         {
-            throw new System.NotImplementedException();
+            return await _repository.GetItem(partitionKey, rowKey);
         }
 
         public async Task UpdateAsync(ScrapeConfig scrapeConfig)

@@ -1,8 +1,94 @@
-﻿@{
+﻿@model IEnumerable<ProductScraper.Models.EntityModels.ProductInfo>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>This is bla bla bla write some text to explain what is this site</p>
 </div>
+
+@if (Model.Any())
+{
+    <p>
+        <a asp-controller="Products" asp-action="Create">Add New</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width: 35%">
+                    Name
+                </th>
+                <th>
+                    Price
+                </th>
+                <th>
+                    Second price
+                </th>
+                <th>
+                    Available
+                </th>
+                <th>
+                    Last checked
+                </th>
+                <th>
+                    Changed
+                </th>
+                <th style="width: 20%">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <a target="_blank" href="@item.URL">@item.Name</a>
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SecondPrice)
+                    </td>
+                    <td>
+                        @if (item.Availability.HasValue)
+                        {
+                            if (item.Availability.Value)
+                            {
+                                <i class="fas fa-check text-success"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-times text-danger"></i>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastCheckedOn)
+                    </td>
+                    <td>
+                        @if (item.HasChangesSinceLastTime)
+                        {
+                            <i class="fas fa-check text-success"></i>
+                        }
+                        else
+                        {
+                            <i class="fas fa-times text-danger"></i>
+                        }
+                    </td>
+                    <td>
+                        <a asp-controller="Products" asp-action="Check" asp-route-id="@item.Id">Check</a> |
+                        <a asp-controller="Products" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Id">Info</a> |
+                        <a asp-controller="Products" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}

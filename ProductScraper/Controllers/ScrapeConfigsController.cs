@@ -23,13 +23,14 @@ namespace ProductScraper.Areas.Admin.Controllers
         }
 
         // GET: ScrapeConfigs/Details/5
-        public async Task<IActionResult> Details(long? id)
+        [Route("Details/{partitionKey}/{rowKey}")]
+        public async Task<IActionResult> Details(string partitionKey, string rowKey)
         {
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(rowKey))
             {
                 return NotFound();
             }
-            var scrapeConfig = await _scrapeConfigService.GetDetailsAsync(id.Value);
+            var scrapeConfig = await _scrapeConfigService.GetDetailsAsync(partitionKey, rowKey);
             if (scrapeConfig == null)
             {
                 return NotFound();
@@ -60,13 +61,14 @@ namespace ProductScraper.Areas.Admin.Controllers
         }
 
         // GET: ScrapeConfigs/Edit/5
-        public async Task<IActionResult> Edit(long? id)
+        [Route("Edit/{partitionKey}/{rowKey}")]
+        public async Task<IActionResult> Edit(string partitionKey, string rowKey)
         {
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(rowKey))
             {
                 return NotFound();
             }
-            var scrapeConfig = await _scrapeConfigService.GetDetailsAsync(id.Value);
+            var scrapeConfig = await _scrapeConfigService.GetDetailsAsync(partitionKey, rowKey);
             if (scrapeConfig == null)
             {
                 return NotFound();
@@ -79,7 +81,8 @@ namespace ProductScraper.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("Id,Name,URL,ProductNamePath,ProductPricePath,ProductSecondPricePath,ProductAvailabilityPath,ProductAvailabilityValue,ProductAvailabilityIsAtributeValue")] ScrapeConfig scrapeConfig)
+        [Route("Edit/{partitionKey}/{rowKey}")]
+        public async Task<IActionResult> Edit(long id, [Bind("PartitionKey,RowKey,Id,Name,URL,ProductNamePath,ProductPricePath,ProductSecondPricePath,ProductAvailabilityPath,ProductAvailabilityValue,ProductAvailabilityIsAtributeValue")] ScrapeConfig scrapeConfig)
         {
             if (id != scrapeConfig.Id)
             {
@@ -95,13 +98,14 @@ namespace ProductScraper.Areas.Admin.Controllers
         }
 
         // GET: ScrapeConfigs/Delete/5
-        public async Task<IActionResult> Delete(long? id)
+        [Route("Delete/{partitionKey}/{rowKey}")]
+        public async Task<IActionResult> Delete(string partitionKey, string rowKey)
         {
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(rowKey))
             {
                 return NotFound();
             }
-            var scrapeConfig = await _scrapeConfigService.GetDetailsAsync(id.Value);
+            var scrapeConfig = await _scrapeConfigService.GetDetailsAsync(partitionKey, rowKey);
             if (scrapeConfig == null)
             {
                 return NotFound();
@@ -113,9 +117,14 @@ namespace ProductScraper.Areas.Admin.Controllers
         // POST: ScrapeConfigs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
+        [Route("Delete/{partitionKey}/{rowKey}")]
+        public async Task<IActionResult> DeleteConfirmed(string partitionKey, string rowKey)
         {
-            await _scrapeConfigService.DeleteAsync(id);
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(rowKey))
+            {
+                return NotFound();
+            }
+            await _scrapeConfigService.DeleteAsync(partitionKey, rowKey);
             return RedirectToAction(nameof(Index));
         }
     }

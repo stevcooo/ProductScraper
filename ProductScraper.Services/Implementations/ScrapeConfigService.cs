@@ -68,5 +68,15 @@ namespace ProductScraper.Services.Implementations
         {
             return _context.ScrapeConfigs.Any(e => e.Id == id);
         }
+
+        public Task<ScrapeConfig> GetDetailsAsync(string partitionKey, string rowKey)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAsync(string partitionKey, string rowKey)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
