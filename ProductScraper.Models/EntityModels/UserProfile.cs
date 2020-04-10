@@ -11,6 +11,7 @@ namespace ProductScraper.Models.EntityModels
         public string LastName { get; set; }
         public virtual IList<ProductInfo> ProductInfos { get; set; }
         public DateTime LastNotificationEmailSendOn { get; set; }
+        public bool EnableEmailNotifications { get; set; }
         public int DaysBetweenEmailNotifications { get; set; }
         public bool SendEmailWhenNoProductHasBeenChanged { get; set; }
     }

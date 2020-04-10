@@ -89,7 +89,9 @@ namespace ProductScraper.Areas.Identity.Pages.Account
 
                     var userProfile = new UserProfile
                     {
-                        UserId = user.Id
+                        UserId = user.Id,
+                        EnableEmailNotifications = true,
+                        DaysBetweenEmailNotifications = 7
                     };
                     await _userProfileService.AddAsync(userProfile);
 

@@ -6,16 +6,93 @@
 }
 
 <h4>@ViewData["Title"]</h4>
-
+<partial name="_StatusMessage" model="Model.StatusMessage" />
 <div class="row">
     <div class="col-md-10">
-        <p>We can send you an email every time when some of your products have changed price or availability.</p>
-        <p>Please choose your preferences on how often you want us to check for product changes.</p>
-        <p>Should we send you an email when there is no change?</p>
-        <button id="save-notification-settings-button" type="submit" class="btn btn-primary">Save</button>
+        <form id="profile-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-group input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <input type="checkbox" asp-for="Input.EnableEmailNotifications" id="areEnabled">
+                    </div>
+                </div>
+                <label class="form-control" asp-for="Input.EnableEmailNotifications"></label>
+            </div>
+
+            <div class="form-group" id="radiobuttons">
+                @foreach (var emailFrequency in Model.EmailFrequencies)
+                {
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="radio" asp-for="Input.EmailFrequency" value="@emailFrequency" />
+                            </div>
+                        </div>
+                        <label type="text" readonly class="form-control">@emailFrequency</label>
+                    </div>
+                }
+
+                <div class="form-group input-group" id="custom">
+                    <label type="text" readonly class="form-control">Every</label>
+                    <input asp-for="Input.DaysBetweenEmailNotifications" class="form-control" />
+                    <label type="text" readonly class="form-control">days</label>
+                </div>
+
+                <div class="form-group input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">
+                            <input type="checkbox" asp-for="Input.SendEmailWhenNoProductHasBeenChanged">
+                        </div>
+                    </div>
+                    <label class="form-control" asp-for="Input.SendEmailWhenNoProductHasBeenChanged"></label>
+                </div>
+            </div>            
+            <button id="update-profile-button" type="submit" class="btn btn-primary">Save</button>
+        </form>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        if ($("input[value='Custom']").is(':checked')) {
+            $('#custom').show();
+        } else {
+            $('#custom').hide();
+        }
+
+        if ($('#areEnabled').is(':checked')) {
+            $('#radiobuttons').show();
+        } else {
+            $('#radiobuttons').hide();            
+        }
+
+        console.log($('#areEnabled'));
+    });
+
+    $('#areEnabled').change(function () {
+        if (!this.checked) {
+            $('#radiobuttons').hide();
+        }
+        else {
+            $('#radiobuttons').show();
+        }        
+    });
+
+    $("input[name='Input.EmailFrequency']").change(function () {
+        if (this.value == "Custom") {
+            $('#custom').show();
+        }
+        else {
+            $('#custom').hide();
+        }
+    });
+
+</script>

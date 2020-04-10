@@ -41,9 +41,10 @@ namespace ProductScraper.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            public bool EveryDay { get; set; }
-            public bool EveryMonday { get; set; }
-            public bool EveryMonth { get; set; }
+            public string EmailFrequency { get; set; }
+
+            [Display(Name = "Enable email notifications")]
+            public bool EnableEmailNotifications { get; set; }
 
             [Display(Name = "Days between email notifications")]
             public int DaysBetweenEmailNotifications { get; set; }
@@ -55,17 +56,25 @@ namespace ProductScraper.Areas.Identity.Pages.Account.Manage
         [BindProperty]
         public InputModel Input { get; set; }
 
+        public string[] EmailFrequencies= new[] { "Daily", "Weekly", "Monthly", "Custom" };
+
         private async Task LoadAsync(IdentityUser user)
         {
             var userProfile = await _userProfileService.GetByUserId(user.Id);
             Input = new InputModel
             {
-                DaysBetweenEmailNotifications = userProfile.DaysBetweenEmailNotifications,
+                EnableEmailNotifications = userProfile.EnableEmailNotifications,
+                DaysBetweenEmailNotifications = userProfile.DaysBetweenEmailNotifications,                
                 SendEmailWhenNoProductHasBeenChanged = userProfile.SendEmailWhenNoProductHasBeenChanged,
-                EveryDay = userProfile.DaysBetweenEmailNotifications == 1,
-                EveryMonday = userProfile.DaysBetweenEmailNotifications == 7,
-                EveryMonth = userProfile.DaysBetweenEmailNotifications == 30,
+                EmailFrequency = "Custom"
             };
+
+            if (userProfile.DaysBetweenEmailNotifications == 1)
+                Input.EmailFrequency = "Daily";
+            else if (userProfile.DaysBetweenEmailNotifications == 7)
+                Input.EmailFrequency = "Weekly";
+            else if (userProfile.DaysBetweenEmailNotifications == 30)
+                Input.EmailFrequency = "Monthly";                            
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -85,7 +94,22 @@ namespace ProductScraper.Areas.Identity.Pages.Account.Manage
             var userProfile = await _userProfileService.GetByUserId(user.Id);
             if (userProfile != null)
             {
-                userProfile.DaysBetweenEmailNotifications = Input.DaysBetweenEmailNotifications;
+                userProfile.EnableEmailNotifications = Input.EnableEmailNotifications;
+                switch (Input.EmailFrequency)
+                {
+                    case "Daily":
+                        userProfile.DaysBetweenEmailNotifications = 1;
+                        break;
+                    case "Weekly":
+                        userProfile.DaysBetweenEmailNotifications = 7;
+                        break;
+                    case "Monthly":
+                        userProfile.DaysBetweenEmailNotifications = 30;
+                        break;
+                    default:
+                        userProfile.DaysBetweenEmailNotifications = Input.DaysBetweenEmailNotifications;
+                        break;
+                }
                 userProfile.SendEmailWhenNoProductHasBeenChanged = Input.SendEmailWhenNoProductHasBeenChanged;
                 await _userProfileService.UpdateAsync(userProfile);
             }
