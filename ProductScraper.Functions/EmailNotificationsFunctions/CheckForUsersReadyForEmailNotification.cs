@@ -1,6 +1,7 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
+using ProductScraper.Common;
 using ProductScraper.Models.EntityModels;
 using System;
 
@@ -8,7 +9,7 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
 {
     public static class CheckForUsersReadyForEmailNotification
     {
-        [FunctionName("CheckForUsersReadyForEmailNotification")]
+        [FunctionName(FunctionsNames.CheckForUsersReadyForEmailNotification)]
         //"0 0 */2 * * *"	once every two hours
         public static async void Run([TimerTrigger("0 0 */2 * * *")]TimerInfo myTimer,
             [Table("UserProfile")] CloudTable userProfileTable,

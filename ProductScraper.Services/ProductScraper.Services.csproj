@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ProductScraper.Common\ProductScraper.Common.csproj" />
     <ProjectReference Include="..\ProductScraper.Models\ProductScraper.Models.csproj" />
   </ItemGroup>
 

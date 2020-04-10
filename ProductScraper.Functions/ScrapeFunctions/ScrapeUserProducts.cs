@@ -2,6 +2,7 @@ using HtmlAgilityPack;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
+using ProductScraper.Common;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.Extensions;
 using ProductScraper.Models.ViewModels;
@@ -16,7 +17,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
     {
         static WebClient _webClient = new WebClient();
 
-        [FunctionName("ScrapeUserProducts")]
+        [FunctionName(FunctionsNames.ScrapeUserProducts)]
         public static async void Run(
             [QueueTrigger("usersReadyForNotifications", Connection = "AzureWebJobsStorage")]UserProfile userProfile,
             [Queue("ProductUpdateEmailNotifications")] IAsyncCollector<EmailMessage> emailMessageQueue,

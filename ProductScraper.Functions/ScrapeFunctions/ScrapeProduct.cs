@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
+using ProductScraper.Common;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.Extensions;
 using ProductScraper.Models.ViewModels;
@@ -19,7 +20,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
     {
         static WebClient _webClient = new WebClient();
 
-        [FunctionName("ScrapeProduct")]
+        [FunctionName(FunctionsNames.ScrapeProduct)]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "ScrapeProduct/{userId}/{productId}")] HttpRequest req,
             [Table("ProductInfo", "{userId}")] CloudTable productInfoTable,

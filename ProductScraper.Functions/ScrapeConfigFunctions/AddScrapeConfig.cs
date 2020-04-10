@@ -1,35 +1,40 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
+using ProductScraper.Common;
+using ProductScraper.Models.EntityModels;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace ProductScraper.Functions.ScrapeConfigFunctions
 {
     public static class AddScrapeConfig
     {
-        [FunctionName("AddScrapeConfig")]
+        [FunctionName(FunctionsNames.AddScrapeConfig)]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [Table("ScrapeConfig")] CloudTable scrapeConfigTable,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("AddScrapeConfig trigger function processed a request.");
 
-            string name = req.Query["name"];
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var scrapeConfig = JsonConvert.DeserializeObject<ScrapeConfig>(requestBody);
+            
+            if (scrapeConfig == null)
+                return new BadRequestResult();            
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            var insertOperation = TableOperation.Insert(scrapeConfig);
+            var result = await scrapeConfigTable.ExecuteAsync(insertOperation);
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
+            if (199 < result.HttpStatusCode && result.HttpStatusCode < 300)
+                return new OkObjectResult(result.Result);
+            else
+                return new BadRequestObjectResult(result.Result);
         }
     }
 }

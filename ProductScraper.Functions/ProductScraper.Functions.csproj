@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.3" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ProductScraper.Common\ProductScraper.Common.csproj" />
     <ProjectReference Include="..\ProductScraper.Models\ProductScraper.Models.csproj" />
   </ItemGroup>
   <ItemGroup>

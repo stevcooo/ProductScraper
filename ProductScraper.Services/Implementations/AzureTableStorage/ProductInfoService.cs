@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using ProductScraper.Common;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.ViewModels;
 using ProductScraper.Services.Interfaces;
@@ -31,25 +32,17 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
 
         public async Task CheckAsync(string userId, long id)
         {
-            var Url = _settings.Value.AzureFunctionURL;
-            Url += $"ScrapeProduct/{userId}/{id}";
-            Url += _settings.Value.AzureFunctionCode;
-
             CancellationToken cancellationToken;
+            
+            var url = _settings.Value.AzureFunctionURL + FunctionsNames.ScrapeProduct + "/" + _settings.Value.AzureFunctionCode;
+            using var client = new HttpClient();
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            using var response = await client
+                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+                .ConfigureAwait(false);
 
-            using (var client = new HttpClient())
-            using (var request = new HttpRequestMessage(HttpMethod.Get, Url))
-            //using (var httpContent = HttpContentHelper.Create(content))
-            {
-                //request.Content = httpContent;
-
-                using (var response = await client
-                    .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-                    .ConfigureAwait(false))
-                {
-
-                }
-            }
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                throw new Exception(await response.Content.ReadAsStringAsync());
         }
 
         public async Task DeleteAsync(string userId, long id)
