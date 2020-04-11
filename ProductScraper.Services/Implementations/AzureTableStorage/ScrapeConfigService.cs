@@ -12,15 +12,12 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
 {
     public class ScrapeConfigService : IScrapeConfigService
     {
-        private readonly IAzureTableStorage<ScrapeConfig> _repository;
         private readonly IOptions<AppSettings> _settings;
         private readonly IHttpHandlerService _httpHandlerService;
 
         public ScrapeConfigService(IOptions<AppSettings> settings, 
-            IAzureTableStorage<ScrapeConfig> repository,
             IHttpHandlerService httpHandlerService)
         {
-            _repository = repository;
             _settings = settings;
             _httpHandlerService = httpHandlerService;
         }
@@ -49,7 +46,8 @@ namespace ProductScraper.Services.Implementations.AzureTableStorage
 
         public async Task<ScrapeConfig> GetDetailsAsync(string partitionKey, string rowKey)
         {
-            return await _repository.GetItem(partitionKey, rowKey);
+            var url = _settings.Value.AzureFunctionURL + FunctionsNames.GetScrapeConfig + $"/{partitionKey}/{rowKey}/" + _settings.Value.AzureFunctionCode;
+            return await _httpHandlerService.HandleGetRequest<ScrapeConfig>(url);
         }
 
         public async Task UpdateAsync(ScrapeConfig scrapeConfig)

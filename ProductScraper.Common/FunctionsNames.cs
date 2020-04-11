@@ -2,6 +2,7 @@
 {
     public static class FunctionsNames
     {
+        public const string GetScrapeConfig = "GetScrapeConfig";
         public const string GetAllScrapeConfigs = "GetAllScrapeConfigs";
         public const string AddScrapeConfig = "AddScrapeConfig";
         public const string UpdateScrapeConfig = "UpdateScrapeConfig";

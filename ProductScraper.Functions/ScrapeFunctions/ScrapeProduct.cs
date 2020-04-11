@@ -8,7 +8,6 @@ using Microsoft.WindowsAzure.Storage.Table;
 using ProductScraper.Common;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.Extensions;
-using ProductScraper.Models.ViewModels;
 using System;
 using System.Linq;
 using System.Net;
@@ -26,12 +25,12 @@ namespace ProductScraper.Functions.ScrapeFunctions
             [Table("ProductInfo", "{userId}")] CloudTable productInfoTable,
             [Table("ScrapeConfig")] CloudTable scrapeConfigTable,
             [Queue("ChnagedProducts")] IAsyncCollector<ProductInfo> changedProductQueue,
-            [Queue("ProductUpdateEmailNotifications")] IAsyncCollector<EmailMessage> emailMessageQueue,
             string userId,
             string productId,
             ILogger log)
         {
             log.LogInformation($"Request to scrape product {productId}");
+
             var productQuery = new TableQuery<ProductInfo>().Where(
                 TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, productId));
             var products = await productInfoTable.ExecuteQuerySegmentedAsync(productQuery, null);
@@ -45,7 +44,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 var configs = await scrapeConfigTable.ExecuteQuerySegmentedAsync(configQuery, null);
                 if (configs != null && configs.Count() == 1)
                 {
-                    Scrape(configs.First(), product, log);
+                    await Scrape(configs.First(), product, log);
                     
                     //Update product in db
                     var operation = TableOperation.InsertOrReplace(product);                    
@@ -54,12 +53,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
                     if (product.HasChangesSinceLastTime)
                     {
                         await changedProductQueue.AddAsync(product);
-                    }
-
-                    /*
-                    var emailMessage = new EmailMessage(userId, "Products updates", "Testing scenario!");
-                    await emailMessageQueue.AddAsync(emailMessage);
-                    */
+                    }                  
                 }
                 else
                 {
@@ -76,7 +70,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
             return new OkObjectResult(responseMessage);
         }
 
-        private static void Scrape(ScrapeConfig scrapeConfig, ProductInfo product, ILogger log)
+        private static async Task Scrape(ScrapeConfig scrapeConfig, ProductInfo product, ILogger log)
         {
             if (string.IsNullOrWhiteSpace(product.URL))
             {
@@ -84,10 +78,9 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 return;
             }
 
-            string html = _webClient.DownloadString(product.URL);
+            string html = await _webClient.DownloadStringTaskAsync(product.URL);
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(html);
-
             product.HasChangesSinceLastTime = false;
 
             try
@@ -174,12 +167,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 //Log the exception
                 log.LogInformation(ex.Message);
             }
-            product.LastCheckedOn = DateTime.UtcNow;
-
-            if (product.HasChangesSinceLastTime)
-            {
-                //Send email
-            }
+            product.LastCheckedOn = DateTime.UtcNow;          
         }
     }
 }

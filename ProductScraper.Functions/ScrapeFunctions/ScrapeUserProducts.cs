@@ -178,11 +178,6 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 log.LogInformation(ex.Message);
             }
             product.LastCheckedOn = DateTime.UtcNow;
-
-            if (product.HasChangesSinceLastTime)
-            {
-                //Send email
-            }
         }
     }
 }
