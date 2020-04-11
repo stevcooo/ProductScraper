@@ -1,9 +1,10 @@
 ﻿using ProductScraper.Models.ViewModels;
+using System.Threading.Tasks;
 
 namespace ProductScraper.Services.Interfaces
 {
     public interface IEmailSender
     {
-        void SendEmail(EmailMessage message);
+        Task SendEmail(EmailMessage message);
     }
 }

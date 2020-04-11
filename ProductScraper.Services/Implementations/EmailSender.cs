@@ -1,59 +1,27 @@
-﻿using MailKit.Net.Smtp;
-using MimeKit;
+﻿using Microsoft.Extensions.Options;
+using ProductScraper.Common.Naming;
 using ProductScraper.Models.ViewModels;
 using ProductScraper.Services.Interfaces;
+using System.Threading.Tasks;
 
 namespace ProductScraper.Services.Implementations
 {
     public class EmailSender : IEmailSender
     {
-        private readonly EmailConfiguration _emailConfig;
+        private IOptions<AppSettings> _settings;
+        private IHttpHandlerService _httpHandlerService;
 
-        public EmailSender(EmailConfiguration emailConfig)
+        public EmailSender(IOptions<AppSettings> settings,
+            IHttpHandlerService httpHandlerService)
         {
-            _emailConfig = emailConfig;
+            _settings = settings;
+            _httpHandlerService = httpHandlerService;
         }
 
-        public void SendEmail(EmailMessage message)
+        public async Task SendEmail(EmailMessage message)
         {
-            var emailMessage = CreateEmailMessage(message);
-            Send(emailMessage);
-        }
-
-        private MimeMessage CreateEmailMessage(EmailMessage message)
-        {
-            var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress(_emailConfig.From));
-            emailMessage.To.Add(new MailboxAddress(message.To));
-            emailMessage.Subject = message.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
-
-            return emailMessage;
-        }
-
-        private void Send(MimeMessage mailMessage)
-        {
-            using (var client = new SmtpClient())
-            {
-                try
-                {
-                    client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, true);
-                    client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
-
-                    client.Send(mailMessage);
-                }
-                catch
-                {
-                    //log an error message or throw an exception or both.
-                    throw;
-                }
-                finally
-                {
-                    client.Disconnect(true);
-                    client.Dispose();
-                }
-            }
-        }
+            var url = _settings.Value.AzureFunctionURL + FunctionName.EmailSender + "/" + _settings.Value.AzureFunctionCode;
+            await _httpHandlerService.HandlePostRequest(url, message);
+        }       
     }
 }

@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductScraper", "ProductSc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductScraper.Functions", "ProductScraper.Functions\ProductScraper.Functions.csproj", "{B1F32353-03DB-4E80-9DD2-9856160B9981}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductScraper.Common", "ProductScraper.Common\ProductScraper.Common.csproj", "{15500699-AD5B-4EC1-B5C6-7CE1D23C0D4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductScraper.Common", "ProductScraper.Common\ProductScraper.Common.csproj", "{15500699-AD5B-4EC1-B5C6-7CE1D23C0D4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -12,6 +12,7 @@
         public const string ScrapeUserProducts = "ScrapeUserProducts";
         public const string CheckForUsersReadyForEmailNotification = "CheckForUsersReadyForEmailNotification";
         public const string EmailSender = "EmailSender";
+        public const string EmailToSendGrid = "EmailToSendGrid";        
         public const string GenerateProductUpdateEmail = "GenerateProductUpdateEmail";        
     }
 }

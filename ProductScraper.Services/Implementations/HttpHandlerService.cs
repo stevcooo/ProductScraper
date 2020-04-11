@@ -18,7 +18,6 @@ namespace ProductScraper.Services.Implementations
         {
             httpClient = new HttpClient();
         }
-
         public HttpContent CreateContent(object content)
         {
             HttpContent httpContent = null;
@@ -34,7 +33,6 @@ namespace ProductScraper.Services.Implementations
 
             return httpContent;
         }
-
         public async Task<T> HandleGetRequest<T>(string url)
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
@@ -51,7 +49,6 @@ namespace ProductScraper.Services.Implementations
                 return result;
             }
         }
-
         public async Task HandlePostRequest(string url, object content)
         {
             using var request = new HttpRequestMessage(HttpMethod.Post, url);

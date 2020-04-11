@@ -16,7 +16,8 @@ namespace ProductScraper.Services.Implementations
         private readonly IAzureTableStorage<ProductInfo> _repository;
         private readonly IOptions<AppSettings> _settings;
 
-        public ProductInfoService(IAzureTableStorage<ProductInfo> repository, IOptions<AppSettings> settings)
+        public ProductInfoService(IAzureTableStorage<ProductInfo> repository, 
+            IOptions<AppSettings> settings)
         {
             _repository = repository;
             _settings = settings;
