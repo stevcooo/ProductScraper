@@ -1,6 +1,6 @@
-﻿namespace ProductScraper.Common
+﻿namespace ProductScraper.Common.Naming
 {
-    public static class FunctionsNames
+    public static class FunctionName
     {
         public const string GetScrapeConfig = "GetScrapeConfig";
         public const string GetAllScrapeConfigs = "GetAllScrapeConfigs";

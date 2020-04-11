@@ -51,7 +51,14 @@ namespace ProductScraper.Controllers
                 return NotFound();
             }
             var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _productInfoService.CheckAsync(_userId, id.Value);
+            try
+            {
+                await _productInfoService.CheckAsync(_userId, id.Value);
+            }
+            catch (Exception ex)
+            {
+                //Log error and notify user
+            }
             return RedirectToAction(nameof(Index));
         }
 
@@ -62,8 +69,6 @@ namespace ProductScraper.Controllers
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("URL")] ProductInfo productInfo)
@@ -74,7 +79,15 @@ namespace ProductScraper.Controllers
                 try
                 {
                     await _productInfoService.AddAsync(_userId, productInfo);
-                    await _productInfoService.CheckAsync(_userId, productInfo.Id);
+                    try
+                    {
+                        await _productInfoService.CheckAsync(_userId, productInfo.Id);
+                    }
+                    catch(Exception ex)
+                    {
+                        //Log error and notify user
+                    }
+
                 }
                 catch (ScrapeServiceException exception)
                 {

@@ -1,7 +1,7 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
-using ProductScraper.Common;
+using ProductScraper.Common.Naming;
 using ProductScraper.Models.ViewModels;
 using SendGrid.Helpers.Mail;
 using System.Linq;
@@ -10,10 +10,10 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
 {
     public static class GenerateProductUpdateEmail
     {
-        [FunctionName(FunctionsNames.GenerateProductUpdateEmail)]
+        [FunctionName(FunctionName.GenerateProductUpdateEmail)]
         public static async void Run(
-            [QueueTrigger("ProductUpdateEmailNotifications", Connection = "AzureWebJobsStorage")]EmailMessage emailMessage,
-            [Queue("EmailsToSend")] IAsyncCollector<SendGridMessage> emailMessageQueue,
+            [QueueTrigger(QueueName.ProductUpdateEmailNotifications, Connection = CommonName.Connection)]EmailMessage emailMessage,
+            [Queue(QueueName.EmailsToSend)] IAsyncCollector<SendGridMessage> emailMessageQueue,
             IBinder binder,
             ILogger log)
         {
@@ -22,7 +22,7 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
 
             var usersTable = await binder.BindAsync<CloudTable>(new TableAttribute("v3AspNetUsers")
             {
-                Connection = "AzureWebJobsStorage"
+                Connection = CommonName.Connection
             });
 
             var userEmailQuery = new TableQuery<User>().Where(

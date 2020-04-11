@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
 using ProductScraper.Common;
+using ProductScraper.Common.Naming;
 using ProductScraper.Models.EntityModels;
 using System.Threading.Tasks;
 
@@ -12,10 +13,10 @@ namespace ProductScraper.Functions.ScrapeConfigFunctions
 {
     public static class DeleteScrapeConfig
     {
-        [FunctionName(FunctionsNames.DeleteScrapeConfig)]
+        [FunctionName(FunctionName.DeleteScrapeConfig)]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = FunctionsNames.DeleteScrapeConfig+"/{partitionKey}/{rowKey}")] HttpRequest req,            
-            [Table("ScrapeConfig")] CloudTable scrapeConfigTable,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = FunctionName.DeleteScrapeConfig+"/{partitionKey}/{rowKey}")] HttpRequest req,            
+            [Table(TableName.ScrapeConfig)] CloudTable scrapeConfigTable,
             string partitionKey,
             string rowKey,
             ILogger log)

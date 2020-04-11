@@ -5,7 +5,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
-using ProductScraper.Common;
+using ProductScraper.Common.Naming;
 using ProductScraper.Models.EntityModels;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,10 +14,10 @@ namespace ProductScraper.Functions.ScrapeConfigFunctions
 {
     public static class AddScrapeConfig
     {
-        [FunctionName(FunctionsNames.AddScrapeConfig)]
+        [FunctionName(FunctionName.AddScrapeConfig)]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            [Table("ScrapeConfig")] CloudTable scrapeConfigTable,
+            [Table(TableName.ScrapeConfig)] CloudTable scrapeConfigTable,
             ILogger log)
         {
             log.LogInformation("AddScrapeConfig trigger function processed a request.");

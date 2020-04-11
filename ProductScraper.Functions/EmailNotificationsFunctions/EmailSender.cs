@@ -1,15 +1,15 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using ProductScraper.Common;
+using ProductScraper.Common.Naming;
 using SendGrid.Helpers.Mail;
 
 namespace ProductScraper.Functions.EmailNotificationsFunctions
 {
     public static class EmailSender
     {
-        [FunctionName(FunctionsNames.EmailSender)]
+        [FunctionName(FunctionName.EmailSender)]
         public static void Run(
-            [QueueTrigger("EmailsToSend", Connection = "AzureWebJobsStorage")]SendGridMessage queuedMessage,
+            [QueueTrigger(QueueName.EmailsToSend, Connection = CommonName.Connection)]SendGridMessage queuedMessage,
             [SendGrid(ApiKey = "SendGridApiKey")] out SendGridMessage message,
             ILogger log)
         {

@@ -6,7 +6,7 @@ using ProductScraper.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ProductScraper.Services.Implementations.AzureTableStorage
+namespace ProductScraper.Services.Implementations
 {
     public class AzureTableStorage<T> : IAzureTableStorage<T>
         where T : AzureTableEntity, new()

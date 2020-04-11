@@ -2,7 +2,7 @@ using HtmlAgilityPack;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
-using ProductScraper.Common;
+using ProductScraper.Common.Naming;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.Extensions;
 using ProductScraper.Models.ViewModels;
@@ -17,23 +17,23 @@ namespace ProductScraper.Functions.ScrapeFunctions
     {
         static WebClient _webClient = new WebClient();
 
-        [FunctionName(FunctionsNames.ScrapeUserProducts)]
+        [FunctionName(FunctionName.ScrapeUserProducts)]
         public static async void Run(
-            [QueueTrigger("usersReadyForNotifications", Connection = "AzureWebJobsStorage")]UserProfile userProfile,
-            [Queue("ProductUpdateEmailNotifications")] IAsyncCollector<EmailMessage> emailMessageQueue,
+            [QueueTrigger(QueueName.UsersReadyForNotifications, Connection = CommonName.Connection)]UserProfile userProfile,
+            [Queue(QueueName.ProductUpdateEmailNotifications)] IAsyncCollector<EmailMessage> emailMessageQueue,
             IBinder binder,
             ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {userProfile.FirstName}");
             
-            var productInfoTable = await binder.BindAsync<CloudTable>(new TableAttribute("ProductInfo", userProfile.UserId)
+            var productInfoTable = await binder.BindAsync<CloudTable>(new TableAttribute(TableName.ProductInfo, userProfile.UserId)
             {
-                Connection = "AzureWebJobsStorage"
+                Connection = CommonName.Connection
             });
 
-            var scrapeConfigTable = await binder.BindAsync<CloudTable>(new TableAttribute("ScrapeConfig")
+            var scrapeConfigTable = await binder.BindAsync<CloudTable>(new TableAttribute(TableName.ScrapeConfig)
             {
-                Connection = "AzureWebJobsStorage"
+                Connection = CommonName.Connection
             });
 
             var productQuery = new TableQuery<ProductInfo>();

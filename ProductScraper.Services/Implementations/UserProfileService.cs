@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProductScraper.Services.Implementations.AzureTableStorage
+namespace ProductScraper.Services.Implementations
 {
     public class UserProfileService : IUserProfileService
     {

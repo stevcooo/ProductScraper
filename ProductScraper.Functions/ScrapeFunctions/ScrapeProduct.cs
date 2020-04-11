@@ -5,7 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
-using ProductScraper.Common;
+using ProductScraper.Common.Naming;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.Extensions;
 using System;
@@ -19,12 +19,12 @@ namespace ProductScraper.Functions.ScrapeFunctions
     {
         static WebClient _webClient = new WebClient();
 
-        [FunctionName(FunctionsNames.ScrapeProduct)]
+        [FunctionName(FunctionName.ScrapeProduct)]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "ScrapeProduct/{userId}/{productId}")] HttpRequest req,
-            [Table("ProductInfo", "{userId}")] CloudTable productInfoTable,
-            [Table("ScrapeConfig")] CloudTable scrapeConfigTable,
-            [Queue("ChnagedProducts")] IAsyncCollector<ProductInfo> changedProductQueue,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = FunctionName.ScrapeProduct+"/{userId}/{productId}")] HttpRequest req,
+            [Table(TableName.ProductInfo, "{userId}")] CloudTable productInfoTable,
+            [Table(TableName.ScrapeConfig)] CloudTable scrapeConfigTable,
+            [Queue(QueueName.ChnagedProducts)] IAsyncCollector<ProductInfo> changedProductQueue,
             string userId,
             string productId,
             ILogger log)

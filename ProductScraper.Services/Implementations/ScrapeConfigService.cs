@@ -1,82 +1,59 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.Options;
+using ProductScraper.Common.Naming;
 using ProductScraper.Models.EntityModels;
+using ProductScraper.Models.Extensions;
+using ProductScraper.Models.ViewModels;
 using ProductScraper.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ProductScraper.Services.Implementations
 {
     public class ScrapeConfigService : IScrapeConfigService
     {
-        private readonly IDbContext _context;
+        private readonly IOptions<AppSettings> _settings;
+        private readonly IHttpHandlerService _httpHandlerService;
 
-        public ScrapeConfigService(IDbContext context)
+        public ScrapeConfigService(IOptions<AppSettings> settings, 
+            IHttpHandlerService httpHandlerService)
         {
-            _context = context;
-        }
-
-        public async Task<IList<ScrapeConfig>> GetAllAsync()
-        {
-            return await _context.ScrapeConfigs.ToListAsync();
-        }
-
-        public async Task<ScrapeConfig> GetDetailsAsync(long id)
-        {
-            return await _context.ScrapeConfigs.FirstOrDefaultAsync(t=>t.Id == id);
+            _settings = settings;
+            _httpHandlerService = httpHandlerService;
         }
 
         public async Task AddAsync(ScrapeConfig scrapeConfig)
         {
-            await _context.AddAsync(scrapeConfig);
-            await _context.SaveChangesAsync();
+            scrapeConfig.Id = DateTime.Now.Ticks;
+            scrapeConfig.RowKey = scrapeConfig.Id.ToString();
+            scrapeConfig.PartitionKey = scrapeConfig.URL.ToCoreUrl();
+            
+            var url = _settings.Value.AzureFunctionURL + FunctionName.AddScrapeConfig + "/" + _settings.Value.AzureFunctionCode;
+            await _httpHandlerService.HandlePostRequest(url, scrapeConfig);
+        }
+
+        public async Task DeleteAsync(string partitionKey, string rowKey)
+        {
+            var url = _settings.Value.AzureFunctionURL + FunctionName.DeleteScrapeConfig + $"/{partitionKey}/{rowKey}/" + _settings.Value.AzureFunctionCode;
+            await _httpHandlerService.HandlePostRequest(url, null);
+        }
+
+        public async Task<IList<ScrapeConfig>> GetAllAsync()
+        {
+            var url = _settings.Value.AzureFunctionURL + FunctionName.GetAllScrapeConfigs + "/" + _settings.Value.AzureFunctionCode;
+            return await _httpHandlerService.HandleGetRequest<IList<ScrapeConfig>>(url);
+        }
+
+        public async Task<ScrapeConfig> GetDetailsAsync(string partitionKey, string rowKey)
+        {
+            var url = _settings.Value.AzureFunctionURL + FunctionName.GetScrapeConfig + $"/{partitionKey}/{rowKey}/" + _settings.Value.AzureFunctionCode;
+            return await _httpHandlerService.HandleGetRequest<ScrapeConfig>(url);
         }
 
         public async Task UpdateAsync(ScrapeConfig scrapeConfig)
         {
-            try
-            {
-                _context.Update(scrapeConfig);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!Exists(scrapeConfig.Id))
-                {
-                    throw new Exception("Item not found");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        public async Task DeleteAsync(long id)
-        {
-            var item = await _context.ScrapeConfigs
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (item == null)
-                throw new Exception("Item not found");
-
-            _context.ScrapeConfigs.Remove(item);
-            await _context.SaveChangesAsync();
-        }
-
-        private bool Exists(long id)
-        {
-            return _context.ScrapeConfigs.Any(e => e.Id == id);
-        }
-
-        public Task<ScrapeConfig> GetDetailsAsync(string partitionKey, string rowKey)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteAsync(string partitionKey, string rowKey)
-        {
-            throw new NotImplementedException();
+            var url = _settings.Value.AzureFunctionURL + FunctionName.UpdateScrapeConfig + "/" + _settings.Value.AzureFunctionCode;
+            await _httpHandlerService.HandlePostRequest(url, scrapeConfig);
         }
     }
 }

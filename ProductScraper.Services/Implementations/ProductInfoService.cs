@@ -1,118 +1,70 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.Options;
+using ProductScraper.Common.Naming;
 using ProductScraper.Models.EntityModels;
+using ProductScraper.Models.ViewModels;
 using ProductScraper.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ProductScraper.Services.Implementations
 {
     public class ProductInfoService : IProductInfoService
     {
-        private readonly IDbContext _context;
-        private readonly IScrapeService _scrapeService;
+        private readonly IAzureTableStorage<ProductInfo> _repository;
+        private readonly IOptions<AppSettings> _settings;
 
-        public ProductInfoService(IDbContext context, IScrapeService scrapeService)
+        public ProductInfoService(IAzureTableStorage<ProductInfo> repository, IOptions<AppSettings> settings)
         {
-            _context = context;
-            _scrapeService = scrapeService;
-        }
-
-        public async Task<IList<ProductInfo>> GetAllAsync(string userId)
-        {
-            return await _context.ProductInfos
-                .Include(p => p.UserProfile)
-                .Where(m => m.UserProfile.UserId == userId).ToListAsync();
-        }
-
-        public async Task<ProductInfo> GetDetailsAsync(string userId, long id)
-        {
-            return await _context.ProductInfos
-                .Include(p => p.UserProfile)
-                .Where(m => m.UserProfile.UserId == userId && m.Id == id).FirstOrDefaultAsync();
+            _repository = repository;
+            _settings = settings;
         }
 
         public async Task AddAsync(string userId, ProductInfo productInfo)
         {
-            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(t => t.UserId == userId);
-            productInfo.UserProfileId = userProfile.Id;
-
-            await _scrapeService.ScrapeProductInfoAsync(productInfo);            
-            await _context.AddAsync(productInfo);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(string userId, ProductInfo productInfo)
-        {
-            var product = await _context.ProductInfos
-                .Include(p => p.UserProfile)
-                .FirstOrDefaultAsync(m => m.UserProfile.UserId == userId && m.Id == productInfo.Id);
-            if (product == null)
-                throw new Exception("Item not found");
-
-            product.URL = productInfo.URL;
-            await _scrapeService.ScrapeProductInfoAsync(product);
-            try
-            {
-                _context.Update(product);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!Exists(productInfo.Id))
-                {
-                    throw new Exception("Item not found");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        public async Task DeleteAsync(string userId, long id)
-        {
-            var productInfo = await _context.ProductInfos
-                .Include(p => p.UserProfile)
-                .FirstOrDefaultAsync(m => m.UserProfile.UserId == userId && m.Id == id);
-            if (productInfo == null)
-                throw new Exception("Item not found");
-
-            _context.ProductInfos.Remove(productInfo);
-            await _context.SaveChangesAsync();
+            productInfo.Id = DateTime.Now.Ticks;
+            productInfo.RowKey = productInfo.Id.ToString();
+            productInfo.PartitionKey = userId;
+            await _repository.Insert(productInfo);
         }
 
         public async Task CheckAsync(string userId, long id)
         {
-            var productInfo = await _context.ProductInfos
-                .Include(p => p.UserProfile)
-                .FirstOrDefaultAsync(m => m.UserProfile.UserId == userId && m.Id == id);
-            if (productInfo == null)
-                throw new Exception("Item not found");
+            CancellationToken cancellationToken;
+            
+            var url = _settings.Value.AzureFunctionURL + FunctionName.ScrapeProduct + $"/{userId}/{id}/" + _settings.Value.AzureFunctionCode;
+            using var client = new HttpClient();
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            using var response = await client
+                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+                .ConfigureAwait(false);
 
-            await _scrapeService.ScrapeProductInfoAsync(productInfo);
-            try
-            {
-                _context.Update(productInfo);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!Exists(productInfo.Id))
-                {
-                    throw new Exception("Item not found");
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                throw new Exception(await response.Content.ReadAsStringAsync());
         }
 
-        private bool Exists(long id)
+        public async Task DeleteAsync(string userId, long id)
         {
-            return _context.ProductInfos.Any(e => e.Id == id);
+            await _repository.Delete(userId, id.ToString());
+        }
+
+        public async Task<IList<ProductInfo>> GetAllAsync(string userId)
+        {
+            return await _repository.GetList(userId);
+        }
+
+        public async Task<ProductInfo> GetDetailsAsync(string userId, long id)
+        {
+            return await _repository.GetItem(userId, id.ToString());            
+        }
+
+        public async Task UpdateAsync(string userId, ProductInfo productInfo)
+        {
+            productInfo.RowKey = productInfo.Id.ToString();
+            productInfo.PartitionKey = userId;
+            await _repository.Update(productInfo);            
         }
     }
 }

@@ -2,7 +2,6 @@
 using MimeKit;
 using ProductScraper.Models.ViewModels;
 using ProductScraper.Services.Interfaces;
-using System.Linq;
 
 namespace ProductScraper.Services.Implementations
 {

@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ProductScraper.Common.Naming;
 using ProductScraper.Data;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.ViewModels;
 using ProductScraper.Services.Implementations;
-using ProductScraper.Services.Implementations.AzureTableStorage;
 using ProductScraper.Services.Interfaces;
 using System;
 using IdentityUser = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityUser;
@@ -51,9 +51,9 @@ namespace ProductScraper
                 idconfig.TablePrefix = Configuration.GetSection("AzureTable:IdentityConfiguration:TablePrefix").Value;
                 idconfig.StorageConnectionString = Configuration.GetSection("AzureTable:StorageConnectionString").Value;
                 idconfig.LocationMode = Configuration.GetSection("AzureTable:IdentityConfiguration:LocationMode").Value;
-                idconfig.IndexTableName = Configuration.GetSection("AzureTable:IdentityConfiguration:IndexTableName").Value; // default: AspNetIndex
-                idconfig.RoleTableName = Configuration.GetSection("AzureTable:IdentityConfiguration:RoleTableName").Value;   // default: AspNetRoles
-                idconfig.UserTableName = Configuration.GetSection("AzureTable:IdentityConfiguration:UserTableName").Value;   // default: AspNetUsers
+                idconfig.IndexTableName = TableName.IdentityIndex; // default: AspNetIndex
+                idconfig.RoleTableName = TableName.IdentityRoles;   // default: AspNetRoles
+                idconfig.UserTableName = TableName.IdentityUsers;   // default: AspNetUsers
                 return idconfig;
             }))
             .AddDefaultTokenProviders()
@@ -70,26 +70,26 @@ namespace ProductScraper
                 return new AzureTableStorage<ProductInfo>(
                     new AzureTableSettings(
                         storageConnectionString: Configuration.GetSection("AzureTable:StorageConnectionString").Value,
-                        tableName: Configuration.GetSection("AzureTable:ProductInfoTableName").Value));
+                        tableName: TableName.ProductInfo));
             });
 
-            services.AddScoped<IProductInfoService, Services.Implementations.AzureTableStorage.ProductInfoService>();
+            services.AddScoped<IProductInfoService, ProductInfoService>();
 
             services.AddScoped<IAzureTableStorage<ScrapeConfig>>(factory =>
             {
                 return new AzureTableStorage<ScrapeConfig>(
                     new AzureTableSettings(
                         storageConnectionString: Configuration.GetSection("AzureTable:StorageConnectionString").Value,
-                        tableName: Configuration.GetSection("AzureTable:ScrapeConfigTableName").Value));
+                        tableName: TableName.ScrapeConfig));
             });
-            services.AddScoped<IScrapeConfigService, Services.Implementations.AzureTableStorage.ScrapeConfigService>();
+            services.AddScoped<IScrapeConfigService, ScrapeConfigService>();
 
             services.AddScoped<IAzureTableStorage<UserProfile>>(factory =>
             {
                 return new AzureTableStorage<UserProfile>(
                     new AzureTableSettings(
                         storageConnectionString: Configuration.GetSection("AzureTable:StorageConnectionString").Value,
-                        tableName: Configuration.GetSection("AzureTable:UserProfileTableName").Value));
+                        tableName: TableName.UserProfile));
             });
             services.AddScoped<IUserProfileService, UserProfileService>();
             

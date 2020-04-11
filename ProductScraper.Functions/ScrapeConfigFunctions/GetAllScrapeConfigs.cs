@@ -4,7 +4,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
-using ProductScraper.Common;
+using ProductScraper.Common.Naming;
 using ProductScraper.Models.EntityModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,10 +13,10 @@ namespace ProductScraper.Functions.ScrapeConfigFunctions
 {
     public static class GetAllScrapeConfigs
     {
-        [FunctionName(FunctionsNames.GetAllScrapeConfigs)]
+        [FunctionName(FunctionName.GetAllScrapeConfigs)]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
-            [Table("ScrapeConfig")] CloudTable scrapeConfigTable,
+            [Table(TableName.ScrapeConfig)] CloudTable scrapeConfigTable,
             ILogger log)
         {
             log.LogInformation("GetAllScrapeConfigs trigger function processed a request.");
