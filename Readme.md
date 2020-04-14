@@ -5,3 +5,4 @@
 * Writing/reading azure tables using Azure functions
 * Direct read/write azure table
 * Email sending - Send grid
+* https://product-scrape.azurewebsites.net

@@ -20,7 +20,7 @@ namespace ProductScraper.Services.Implementations
             userProfile.Id = DateTime.Now.Ticks;
             userProfile.RowKey = userProfile.Id.ToString();
             userProfile.PartitionKey = userProfile.UserId;
-            userProfile.LastNotificationEmailSendOn = DateTime.MaxValue;
+            userProfile.LastNotificationEmailSendOn = DateTime.MinValue;
             await _repository.Insert(userProfile);
         }
 
