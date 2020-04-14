@@ -45,13 +45,16 @@ namespace ProductScraper.Functions.ScrapeFunctions
 
             EmailMessage emailMessage;
             StringBuilder emailBodyBoulder = new StringBuilder();
+            
+            log.LogInformation($"userProducts: {userProducts.Results.Count}");
             foreach (ProductInfo product in userProducts)
             {
-                //Find config from allConfigs
-                ScrapeConfig config = allConfigs.FirstOrDefault(t => t.PartitionKey.Equals(product.URL.ToCoreUrl()));
 
+                //Find config from allConfigs
+                ScrapeConfig config = allConfigs.FirstOrDefault(t => t.PartitionKey.Equals(product.URL.ToCoreUrl()));                
                 if (config != null)
                 {
+                    log.LogInformation($"ScrapeConfig : {config.Name}");
                     Scrape(config, product, log);
                     //Update product in db
                     TableOperation operation = TableOperation.InsertOrReplace(product);
@@ -70,10 +73,12 @@ namespace ProductScraper.Functions.ScrapeFunctions
             if (emailBodyBoulder.Length > 0)
             {
                 emailMessage = new EmailMessage(userProfile.UserId, "Products updates", emailBodyBoulder.ToString());
+                log.LogInformation($"EmailMessage Product updates");
                 await emailMessageQueue.AddAsync(emailMessage);
             }
             else if (userProfile.SendEmailWhenNoProductHasBeenChanged)
             {
+                log.LogInformation($"EmailMessage No Product update");
                 emailMessage = new EmailMessage(userProfile.UserId, "Products updates", "None of your products has been updated/changed since last check.");
                 await emailMessageQueue.AddAsync(emailMessage);
             }

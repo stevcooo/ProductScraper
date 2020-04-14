@@ -20,7 +20,7 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
 
             log.LogInformation($"C# Queue trigger function for email sending to user: {emailMessage.To}");
 
-            CloudTable usersTable = await binder.BindAsync<CloudTable>(new TableAttribute("v3AspNetUsers")
+            CloudTable usersTable = await binder.BindAsync<CloudTable>(new TableAttribute(TableName.IdentityUsers)
             {
                 Connection = CommonName.Connection
             });
