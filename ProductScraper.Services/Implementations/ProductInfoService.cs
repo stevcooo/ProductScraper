@@ -16,7 +16,7 @@ namespace ProductScraper.Services.Implementations
         private readonly IAzureTableStorage<ProductInfo> _repository;
         private readonly IOptions<AppSettings> _settings;
 
-        public ProductInfoService(IAzureTableStorage<ProductInfo> repository, 
+        public ProductInfoService(IAzureTableStorage<ProductInfo> repository,
             IOptions<AppSettings> settings)
         {
             _repository = repository;
@@ -34,16 +34,18 @@ namespace ProductScraper.Services.Implementations
         public async Task CheckAsync(string userId, long id)
         {
             CancellationToken cancellationToken;
-            
-            var url = _settings.Value.AzureFunctionURL + FunctionName.ScrapeProduct + $"/{userId}/{id}/" + _settings.Value.AzureFunctionCode;
-            using var client = new HttpClient();
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            using var response = await client
+
+            string url = _settings.Value.AzureFunctionURL + FunctionName.ScrapeProduct + $"/{userId}/{id}/" + _settings.Value.AzureFunctionCode;
+            using HttpClient client = new HttpClient();
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+            using HttpResponseMessage response = await client
                 .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
                 .ConfigureAwait(false);
 
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
                 throw new Exception(await response.Content.ReadAsStringAsync());
+            }
         }
 
         public async Task DeleteAsync(string userId, long id)
@@ -58,14 +60,14 @@ namespace ProductScraper.Services.Implementations
 
         public async Task<ProductInfo> GetDetailsAsync(string userId, long id)
         {
-            return await _repository.GetItem(userId, id.ToString());            
+            return await _repository.GetItem(userId, id.ToString());
         }
 
         public async Task UpdateAsync(string userId, ProductInfo productInfo)
         {
             productInfo.RowKey = productInfo.Id.ToString();
             productInfo.PartitionKey = userId;
-            await _repository.Update(productInfo);            
+            await _repository.Update(productInfo);
         }
     }
 }

@@ -17,32 +17,32 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
             IBinder binder,
             ILogger log)
         {
-            
+
             log.LogInformation($"C# Queue trigger function for email sending to user: {emailMessage.To}");
 
-            var usersTable = await binder.BindAsync<CloudTable>(new TableAttribute("v3AspNetUsers")
+            CloudTable usersTable = await binder.BindAsync<CloudTable>(new TableAttribute("v3AspNetUsers")
             {
                 Connection = CommonName.Connection
             });
 
-            var userEmailQuery = new TableQuery<User>().Where(
+            TableQuery<User> userEmailQuery = new TableQuery<User>().Where(
                 TableQuery.GenerateFilterCondition("Id", QueryComparisons.Equal, emailMessage.To));
-            var users = await usersTable.ExecuteQuerySegmentedAsync(userEmailQuery, null);
-            var user = users.Results.FirstOrDefault();
+            TableQuerySegment<User> users = await usersTable.ExecuteQuerySegmentedAsync(userEmailQuery, null);
+            User user = users.Results.FirstOrDefault();
             if (user != null)
             {
-                
-                var message = new SendGridMessage();
+
+                SendGridMessage message = new SendGridMessage();
                 message.AddTo(user.Email);
                 message.AddContent("text/html", emailMessage.Content);
                 message.SetFrom(new EmailAddress("stevan@kostoski.com"));
-                message.SetSubject(emailMessage.Subject);                
+                message.SetSubject(emailMessage.Subject);
                 await emailMessageQueue.AddAsync(message);
                 log.LogInformation($"Enqueued email message to : {user.Email}");
             }
         }
     }
-    
+
 
     public class User : TableEntity
     {

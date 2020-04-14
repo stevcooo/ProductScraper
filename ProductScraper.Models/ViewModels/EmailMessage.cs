@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ProductScraper.Models.ViewModels
+﻿namespace ProductScraper.Models.ViewModels
 {
     public class EmailMessage
     {

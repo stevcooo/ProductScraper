@@ -22,7 +22,7 @@ namespace ProductScraper.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return View(await _productInfoService.GetAllAsync(_userId));
         }
 
@@ -33,8 +33,8 @@ namespace ProductScraper.Controllers
             {
                 return NotFound();
             }
-            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var productInfo = await _productInfoService.GetDetailsAsync(_userId, id.Value);
+            string _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ProductInfo productInfo = await _productInfoService.GetDetailsAsync(_userId, id.Value);
             if (productInfo == null)
             {
                 return NotFound();
@@ -50,12 +50,12 @@ namespace ProductScraper.Controllers
             {
                 return NotFound();
             }
-            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             try
             {
                 await _productInfoService.CheckAsync(_userId, id.Value);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //Log error and notify user
             }
@@ -75,7 +75,7 @@ namespace ProductScraper.Controllers
         {
             if (ModelState.IsValid)
             {
-                var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                string _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 try
                 {
                     await _productInfoService.AddAsync(_userId, productInfo);
@@ -83,7 +83,7 @@ namespace ProductScraper.Controllers
                     {
                         await _productInfoService.CheckAsync(_userId, productInfo.Id);
                     }
-                    catch(Exception ex)
+                    catch (Exception)
                     {
                         //Log error and notify user
                     }
@@ -106,8 +106,8 @@ namespace ProductScraper.Controllers
             {
                 return NotFound();
             }
-            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var productInfo = await _productInfoService.GetDetailsAsync(_userId, id.Value);
+            string _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ProductInfo productInfo = await _productInfoService.GetDetailsAsync(_userId, id.Value);
             if (productInfo == null)
             {
                 return NotFound();
@@ -129,7 +129,7 @@ namespace ProductScraper.Controllers
 
             if (ModelState.IsValid)
             {
-                var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                string _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 try
                 {
                     await _productInfoService.UpdateAsync(_userId, productInfo);
@@ -152,8 +152,8 @@ namespace ProductScraper.Controllers
             {
                 return NotFound();
             }
-            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var productInfo = await _productInfoService.GetDetailsAsync(_userId, id.Value);
+            string _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ProductInfo productInfo = await _productInfoService.GetDetailsAsync(_userId, id.Value);
             if (productInfo == null)
             {
                 return NotFound();
@@ -167,7 +167,7 @@ namespace ProductScraper.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            var _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             await _productInfoService.DeleteAsync(_userId, id);
             return RedirectToAction(nameof(Index));
         }

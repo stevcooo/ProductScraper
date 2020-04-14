@@ -8,8 +8,8 @@ namespace ProductScraper.Services.Implementations
 {
     public class EmailSender : IEmailSender
     {
-        private IOptions<AppSettings> _settings;
-        private IHttpHandlerService _httpHandlerService;
+        private readonly IOptions<AppSettings> _settings;
+        private readonly IHttpHandlerService _httpHandlerService;
 
         public EmailSender(IOptions<AppSettings> settings,
             IHttpHandlerService httpHandlerService)
@@ -20,8 +20,8 @@ namespace ProductScraper.Services.Implementations
 
         public async Task SendEmail(EmailMessage message)
         {
-            var url = _settings.Value.AzureFunctionURL + FunctionName.EmailSender + "/" + _settings.Value.AzureFunctionCode;
+            string url = _settings.Value.AzureFunctionURL + FunctionName.EmailSender + "/" + _settings.Value.AzureFunctionCode;
             await _httpHandlerService.HandlePostRequest(url, message);
-        }       
+        }
     }
 }

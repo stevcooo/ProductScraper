@@ -6,7 +6,7 @@ namespace ProductScraper.Models.EntityModels
     public class ProductInfo : AzureTableEntity
     {
         public long Id { get; set; }
-        public string Name { get; set; }        
+        public string Name { get; set; }
         [Required]
         [Url]
         public string URL { get; set; }
@@ -20,7 +20,7 @@ namespace ProductScraper.Models.EntityModels
         public virtual long UserProfileId { get; set; }
 
         public ProductInfo()
-        {            
+        {
             LastCheckedOn = DateTime.Now;
         }
     }

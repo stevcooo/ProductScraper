@@ -23,7 +23,7 @@ namespace ProductScraper
             Configuration = configuration;
 
             Configuration = configuration;
-            var builder = new ConfigurationBuilder()
+            IConfigurationBuilder builder = new ConfigurationBuilder()
             .SetBasePath(env.ContentRootPath)
 #if AZURE || RELEASE
             .AddJsonFile($"appsettings.azure.json", optional: true)
@@ -43,17 +43,19 @@ namespace ProductScraper
             {
                 options.SignIn.RequireConfirmedAccount = false;
                 options.User.RequireUniqueEmail = true;
-            })   
+            })
             //ElCamino configuration
             .AddAzureTableStores<ApplicationDbContext>(new Func<IdentityConfiguration>(() =>
             {
-                IdentityConfiguration idconfig = new IdentityConfiguration();
-                idconfig.TablePrefix = Configuration.GetSection("AzureTable:IdentityConfiguration:TablePrefix").Value;
-                idconfig.StorageConnectionString = Configuration.GetSection("AzureTable:StorageConnectionString").Value;
-                idconfig.LocationMode = Configuration.GetSection("AzureTable:IdentityConfiguration:LocationMode").Value;
-                idconfig.IndexTableName = TableName.IdentityIndex; // default: AspNetIndex
-                idconfig.RoleTableName = TableName.IdentityRoles;   // default: AspNetRoles
-                idconfig.UserTableName = TableName.IdentityUsers;   // default: AspNetUsers
+                IdentityConfiguration idconfig = new IdentityConfiguration
+                {
+                    TablePrefix = Configuration.GetSection("AzureTable:IdentityConfiguration:TablePrefix").Value,
+                    StorageConnectionString = Configuration.GetSection("AzureTable:StorageConnectionString").Value,
+                    LocationMode = Configuration.GetSection("AzureTable:IdentityConfiguration:LocationMode").Value,
+                    IndexTableName = TableName.IdentityIndex, // default: AspNetIndex
+                    RoleTableName = TableName.IdentityRoles,   // default: AspNetRoles
+                    UserTableName = TableName.IdentityUsers   // default: AspNetUsers
+                };
                 return idconfig;
             }))
             .AddDefaultTokenProviders()
@@ -92,7 +94,7 @@ namespace ProductScraper
                         tableName: TableName.UserProfile));
             });
             services.AddScoped<IUserProfileService, UserProfileService>();
-            
+
             services.AddScoped<IHttpHandlerService, HttpHandlerService>();
             services.AddScoped<IEmailSender, EmailSender>();
         }

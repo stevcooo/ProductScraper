@@ -13,8 +13,8 @@ namespace ProductScraper.Services.Exceptions
         {
 
         }
-        
-        public ScrapeServiceException(string message, Exception innerException) :base(message, innerException)
+
+        public ScrapeServiceException(string message, Exception innerException) : base(message, innerException)
         {
 
         }

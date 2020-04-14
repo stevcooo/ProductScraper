@@ -1,5 +1,3 @@
-using System;
-
 namespace ProductScraper.Models
 {
     public class ErrorViewModel

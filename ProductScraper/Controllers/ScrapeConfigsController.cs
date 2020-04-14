@@ -30,7 +30,7 @@ namespace ProductScraper.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var scrapeConfig = await _scrapeConfigService.GetDetailsAsync(partitionKey, rowKey);
+            ScrapeConfig scrapeConfig = await _scrapeConfigService.GetDetailsAsync(partitionKey, rowKey);
             if (scrapeConfig == null)
             {
                 return NotFound();
@@ -68,7 +68,7 @@ namespace ProductScraper.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var scrapeConfig = await _scrapeConfigService.GetDetailsAsync(partitionKey, rowKey);
+            ScrapeConfig scrapeConfig = await _scrapeConfigService.GetDetailsAsync(partitionKey, rowKey);
             if (scrapeConfig == null)
             {
                 return NotFound();
@@ -105,7 +105,7 @@ namespace ProductScraper.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var scrapeConfig = await _scrapeConfigService.GetDetailsAsync(partitionKey, rowKey);
+            ScrapeConfig scrapeConfig = await _scrapeConfigService.GetDetailsAsync(partitionKey, rowKey);
             if (scrapeConfig == null)
             {
                 return NotFound();

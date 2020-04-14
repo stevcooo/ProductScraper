@@ -11,32 +11,34 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
     {
         [FunctionName(FunctionName.CheckForUsersReadyForEmailNotification)]
         //"0 0 */2 * * *"	once every two hours
-        public static async void Run([TimerTrigger("0 0 */2 * * *")]TimerInfo myTimer,
+        public static async void Run([TimerTrigger("0 0 */2 * * *")]TimerInfo timerInfo,
             [Table(TableName.UserProfile)] CloudTable userProfileTable,
             [Queue(QueueName.UsersReadyForNotifications)] IAsyncCollector<UserProfile> usersReadyForNotificationsQueue,
             ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
-            var userProfilesQuery = new TableQuery<UserProfile>();
-            var users = await userProfileTable.ExecuteQuerySegmentedAsync(userProfilesQuery, null);            
-            foreach (var user in users)
+            TableQuery<UserProfile> userProfilesQuery = new TableQuery<UserProfile>();
+            TableQuerySegment<UserProfile> users = await userProfileTable.ExecuteQuerySegmentedAsync(userProfilesQuery, null);
+            foreach (UserProfile user in users)
             {
                 if (!user.EnableEmailNotifications)
+                {
                     continue;
+                }
 
-                var timeSpan = DateTime.UtcNow - user.LastNotificationEmailSendOn;
+                TimeSpan timeSpan = DateTime.UtcNow - user.LastNotificationEmailSendOn;
                 if (timeSpan.Days >= user.DaysBetweenEmailNotifications)
                 {
                     log.LogInformation($"User {user.Id} is ready for notifications.");
 
                     //Update user info
-                    user.LastNotificationEmailSendOn = DateTime.UtcNow;                    
-                    var operation = TableOperation.InsertOrReplace(user);
+                    user.LastNotificationEmailSendOn = DateTime.UtcNow;
+                    TableOperation operation = TableOperation.InsertOrReplace(user);
                     await userProfileTable.ExecuteAsync(operation);
 
                     //Send notification to queue
-                    await usersReadyForNotificationsQueue.AddAsync(user);                    
+                    await usersReadyForNotificationsQueue.AddAsync(user);
                 }
             }
         }

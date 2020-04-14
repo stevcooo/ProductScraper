@@ -6,7 +6,7 @@
         public const string ProductUpdateEmailNotifications = "ProductUpdateEmailNotifications";
         public const string EmailsToSend = "EmailsToSend";
         public const string ChnagedProducts = "ChnagedProducts";
-        
+
 
     }
 }

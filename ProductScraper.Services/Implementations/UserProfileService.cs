@@ -9,7 +9,7 @@ namespace ProductScraper.Services.Implementations
     public class UserProfileService : IUserProfileService
     {
         private readonly IAzureTableStorage<UserProfile> _repository;
-        
+
         public UserProfileService(IAzureTableStorage<UserProfile> repository)
         {
             _repository = repository;
@@ -26,9 +26,12 @@ namespace ProductScraper.Services.Implementations
 
         public async Task<UserProfile> GetByUserId(string userId)
         {
-            var users = await _repository.GetList(userId);
+            System.Collections.Generic.List<UserProfile> users = await _repository.GetList(userId);
             if (users.Count != 1)
+            {
                 throw new Exception("Too many users!");
+            }
+
             return users.FirstOrDefault();
         }
 

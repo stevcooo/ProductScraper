@@ -12,8 +12,7 @@ namespace ProductScraper.Services.Implementations
 {
     public class HttpHandlerService : IHttpHandlerService
     {
-        private HttpClient httpClient;
-        private CancellationToken cancellationToken;
+        private readonly HttpClient httpClient;
         public HttpHandlerService()
         {
             httpClient = new HttpClient();
@@ -24,7 +23,7 @@ namespace ProductScraper.Services.Implementations
 
             if (content != null)
             {
-                var ms = new MemoryStream();
+                MemoryStream ms = new MemoryStream();
                 SerializeHelper.SerializeJsonIntoStream(content, ms);
                 ms.Seek(0, SeekOrigin.Begin);
                 httpContent = new StreamContent(ms);
@@ -35,32 +34,36 @@ namespace ProductScraper.Services.Implementations
         }
         public async Task<T> HandleGetRequest<T>(string url)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            using var response = await httpClient
-                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+            using HttpResponseMessage response = await httpClient
+                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, new CancellationToken())
                 .ConfigureAwait(false);
 
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
                 throw new Exception(await response.Content.ReadAsStringAsync());
+            }
             else
             {
                 dynamic body = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<T>(body as string);
+                T result = JsonConvert.DeserializeObject<T>(body as string);
                 return result;
             }
         }
         public async Task HandlePostRequest(string url, object content)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, url);
-            using var httpContent = CreateContent(content);
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
+            using HttpContent httpContent = CreateContent(content);
             request.Content = httpContent;
 
-            using var response = await httpClient
-                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            using HttpResponseMessage response = await httpClient
+                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, new CancellationToken())
                 .ConfigureAwait(false);
 
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
                 throw new Exception(await response.Content.ReadAsStringAsync());
+            }
         }
     }
 }

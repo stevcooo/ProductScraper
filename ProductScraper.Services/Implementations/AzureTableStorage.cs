@@ -132,7 +132,7 @@ namespace ProductScraper.Services.Implementations
             CloudTableClient tableClient = CloudStorageAccount.Parse(settings.StorageConnectionString).CreateCloudTableClient();
 
             //Table
-            CloudTable table = tableClient.GetTableReference(this.settings.TableName);
+            CloudTable table = tableClient.GetTableReference(settings.TableName);
             await table.CreateIfNotExistsAsync();
 
             return table;

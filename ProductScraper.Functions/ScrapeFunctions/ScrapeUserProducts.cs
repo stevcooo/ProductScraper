@@ -15,7 +15,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
 {
     public static class ScrapeUserProducts
     {
-        static WebClient _webClient = new WebClient();
+        private static readonly WebClient _webClient = new WebClient();
 
         [FunctionName(FunctionName.ScrapeUserProducts)]
         public static async void Run(
@@ -25,41 +25,41 @@ namespace ProductScraper.Functions.ScrapeFunctions
             ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {userProfile.FirstName}");
-            
-            var productInfoTable = await binder.BindAsync<CloudTable>(new TableAttribute(TableName.ProductInfo, userProfile.UserId)
+
+            CloudTable productInfoTable = await binder.BindAsync<CloudTable>(new TableAttribute(TableName.ProductInfo, userProfile.UserId)
             {
                 Connection = CommonName.Connection
             });
 
-            var scrapeConfigTable = await binder.BindAsync<CloudTable>(new TableAttribute(TableName.ScrapeConfig)
+            CloudTable scrapeConfigTable = await binder.BindAsync<CloudTable>(new TableAttribute(TableName.ScrapeConfig)
             {
                 Connection = CommonName.Connection
             });
 
-            var productQuery = new TableQuery<ProductInfo>();
-            var userProducts = await productInfoTable.ExecuteQuerySegmentedAsync(productQuery, null);
+            TableQuery<ProductInfo> productQuery = new TableQuery<ProductInfo>();
+            TableQuerySegment<ProductInfo> userProducts = await productInfoTable.ExecuteQuerySegmentedAsync(productQuery, null);
 
             //Load all configs in the begginign/maybe this should be changed in the future
-            var configsQuery = new TableQuery<ScrapeConfig>();
-            var allConfigs = await scrapeConfigTable.ExecuteQuerySegmentedAsync(configsQuery, null);
+            TableQuery<ScrapeConfig> configsQuery = new TableQuery<ScrapeConfig>();
+            TableQuerySegment<ScrapeConfig> allConfigs = await scrapeConfigTable.ExecuteQuerySegmentedAsync(configsQuery, null);
 
             EmailMessage emailMessage;
             StringBuilder emailBodyBoulder = new StringBuilder();
-            foreach (var product in userProducts)
+            foreach (ProductInfo product in userProducts)
             {
                 //Find config from allConfigs
-                var config = allConfigs.FirstOrDefault(t => t.PartitionKey.Equals(product.URL.ToCoreUrl()));
+                ScrapeConfig config = allConfigs.FirstOrDefault(t => t.PartitionKey.Equals(product.URL.ToCoreUrl()));
 
                 if (config != null)
                 {
                     Scrape(config, product, log);
                     //Update product in db
-                    var operation = TableOperation.InsertOrReplace(product);
+                    TableOperation operation = TableOperation.InsertOrReplace(product);
                     await productInfoTable.ExecuteAsync(operation);
                     if (product.HasChangesSinceLastTime)
                     {
                         //Add to Email
-                        emailBodyBoulder.AppendLine($"{product.Name} Price: {product.Price} / {product.SecondPrice} Availability: {product.Availability} CheckedOn: {product.LastCheckedOn}");                        
+                        emailBodyBoulder.AppendLine($"{product.Name} Price: {product.Price} / {product.SecondPrice} Availability: {product.Availability} CheckedOn: {product.LastCheckedOn}");
                     }
                 }
                 else
@@ -72,7 +72,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 emailMessage = new EmailMessage(userProfile.UserId, "Products updates", emailBodyBoulder.ToString());
                 await emailMessageQueue.AddAsync(emailMessage);
             }
-            else if(userProfile.SendEmailWhenNoProductHasBeenChanged)
+            else if (userProfile.SendEmailWhenNoProductHasBeenChanged)
             {
                 emailMessage = new EmailMessage(userProfile.UserId, "Products updates", "None of your products has been updated/changed since last check.");
                 await emailMessageQueue.AddAsync(emailMessage);
@@ -95,7 +95,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
 
             try
             {
-                var titleNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductNamePath);
+                HtmlNode titleNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductNamePath);
                 if (titleNode != null && product.Name != titleNode.InnerText)
                 {
                     product.HasChangesSinceLastTime = true;
@@ -109,7 +109,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
 
             try
             {
-                var priceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductPricePath);
+                HtmlNode priceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductPricePath);
                 if (priceNode != null && product.Price != priceNode.InnerText)
                 {
                     product.HasChangesSinceLastTime = true;
@@ -124,7 +124,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
 
             try
             {
-                var secondPriceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductSecondPricePath);
+                HtmlNode secondPriceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductSecondPricePath);
                 if (secondPriceNode != null && product.SecondPrice != secondPriceNode.InnerText)
                 {
                     product.HasChangesSinceLastTime = true;
@@ -138,14 +138,14 @@ namespace ProductScraper.Functions.ScrapeFunctions
 
             try
             {
-                var availabilityNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductAvailabilityPath);
+                HtmlNode availabilityNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductAvailabilityPath);
                 if (availabilityNode != null)
                 {
                     bool isAviliable = false;
 
                     if (scrapeConfig.ProductAvailabilityIsAtributeValue)
                     {
-                        var attr = availabilityNode.Attributes.FirstOrDefault(t => t.Value == scrapeConfig.ProductAvailabilityValue);
+                        HtmlAttribute attr = availabilityNode.Attributes.FirstOrDefault(t => t.Value == scrapeConfig.ProductAvailabilityValue);
                         if (attr != null)
                         {
                             isAviliable = true;
@@ -153,8 +153,10 @@ namespace ProductScraper.Functions.ScrapeFunctions
                     }
                     else
                     {
-                        if (!String.IsNullOrEmpty(scrapeConfig.ProductAvailabilityValue) && availabilityNode.InnerText == scrapeConfig.ProductAvailabilityValue)
+                        if (!string.IsNullOrEmpty(scrapeConfig.ProductAvailabilityValue) && availabilityNode.InnerText == scrapeConfig.ProductAvailabilityValue)
+                        {
                             isAviliable = true;
+                        }
                         else
                         {
                             isAviliable = availabilityNode != null;
@@ -169,8 +171,9 @@ namespace ProductScraper.Functions.ScrapeFunctions
                     }
                 }
                 else
+                {
                     product.Availability = null;
-
+                }
             }
             catch (Exception ex)
             {

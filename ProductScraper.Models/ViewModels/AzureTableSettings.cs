@@ -7,13 +7,17 @@ namespace ProductScraper.Models.ViewModels
         public AzureTableSettings(string storageConnectionString, string tableName)
         {
             if (string.IsNullOrEmpty(storageConnectionString))
+            {
                 throw new ArgumentNullException("StorageConnectionString");
+            }
 
             if (string.IsNullOrEmpty(tableName))
+            {
                 throw new ArgumentNullException("TableName");
+            }
 
-            this.StorageConnectionString = storageConnectionString;
-            this.TableName = tableName;
+            StorageConnectionString = storageConnectionString;
+            TableName = tableName;
         }
 
         public string TableName { get; }

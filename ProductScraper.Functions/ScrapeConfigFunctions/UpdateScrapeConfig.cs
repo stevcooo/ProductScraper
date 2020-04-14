@@ -22,19 +22,25 @@ namespace ProductScraper.Functions.ScrapeConfigFunctions
         {
             log.LogInformation("UpdateScrapeConfig trigger function processed a request.");
 
-            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var scrapeConfig = JsonConvert.DeserializeObject<ScrapeConfig>(requestBody);
-            
-            if (scrapeConfig == null)
-                return new BadRequestResult();
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            ScrapeConfig scrapeConfig = JsonConvert.DeserializeObject<ScrapeConfig>(requestBody);
 
-            var insertOperation = TableOperation.InsertOrReplace(scrapeConfig);
-            var result = await scrapeConfigTable.ExecuteAsync(insertOperation);
+            if (scrapeConfig == null)
+            {
+                return new BadRequestResult();
+            }
+
+            TableOperation insertOperation = TableOperation.InsertOrReplace(scrapeConfig);
+            TableResult result = await scrapeConfigTable.ExecuteAsync(insertOperation);
 
             if (199 < result.HttpStatusCode && result.HttpStatusCode < 300)
+            {
                 return new OkObjectResult(result.Result);
+            }
             else
+            {
                 return new BadRequestObjectResult(result.Result);
+            }
         }
     }
 }

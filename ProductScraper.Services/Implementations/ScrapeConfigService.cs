@@ -15,7 +15,7 @@ namespace ProductScraper.Services.Implementations
         private readonly IOptions<AppSettings> _settings;
         private readonly IHttpHandlerService _httpHandlerService;
 
-        public ScrapeConfigService(IOptions<AppSettings> settings, 
+        public ScrapeConfigService(IOptions<AppSettings> settings,
             IHttpHandlerService httpHandlerService)
         {
             _settings = settings;
@@ -27,32 +27,32 @@ namespace ProductScraper.Services.Implementations
             scrapeConfig.Id = DateTime.Now.Ticks;
             scrapeConfig.RowKey = scrapeConfig.Id.ToString();
             scrapeConfig.PartitionKey = scrapeConfig.URL.ToCoreUrl();
-            
-            var url = _settings.Value.AzureFunctionURL + FunctionName.AddScrapeConfig + "/" + _settings.Value.AzureFunctionCode;
+
+            string url = _settings.Value.AzureFunctionURL + FunctionName.AddScrapeConfig + "/" + _settings.Value.AzureFunctionCode;
             await _httpHandlerService.HandlePostRequest(url, scrapeConfig);
         }
 
         public async Task DeleteAsync(string partitionKey, string rowKey)
         {
-            var url = _settings.Value.AzureFunctionURL + FunctionName.DeleteScrapeConfig + $"/{partitionKey}/{rowKey}/" + _settings.Value.AzureFunctionCode;
+            string url = _settings.Value.AzureFunctionURL + FunctionName.DeleteScrapeConfig + $"/{partitionKey}/{rowKey}/" + _settings.Value.AzureFunctionCode;
             await _httpHandlerService.HandlePostRequest(url, null);
         }
 
         public async Task<IList<ScrapeConfig>> GetAllAsync()
         {
-            var url = _settings.Value.AzureFunctionURL + FunctionName.GetAllScrapeConfigs + "/" + _settings.Value.AzureFunctionCode;
+            string url = _settings.Value.AzureFunctionURL + FunctionName.GetAllScrapeConfigs + "/" + _settings.Value.AzureFunctionCode;
             return await _httpHandlerService.HandleGetRequest<IList<ScrapeConfig>>(url);
         }
 
         public async Task<ScrapeConfig> GetDetailsAsync(string partitionKey, string rowKey)
         {
-            var url = _settings.Value.AzureFunctionURL + FunctionName.GetScrapeConfig + $"/{partitionKey}/{rowKey}/" + _settings.Value.AzureFunctionCode;
+            string url = _settings.Value.AzureFunctionURL + FunctionName.GetScrapeConfig + $"/{partitionKey}/{rowKey}/" + _settings.Value.AzureFunctionCode;
             return await _httpHandlerService.HandleGetRequest<ScrapeConfig>(url);
         }
 
         public async Task UpdateAsync(ScrapeConfig scrapeConfig)
         {
-            var url = _settings.Value.AzureFunctionURL + FunctionName.UpdateScrapeConfig + "/" + _settings.Value.AzureFunctionCode;
+            string url = _settings.Value.AzureFunctionURL + FunctionName.UpdateScrapeConfig + "/" + _settings.Value.AzureFunctionCode;
             await _httpHandlerService.HandlePostRequest(url, scrapeConfig);
         }
     }

@@ -22,13 +22,15 @@ namespace ProductScraper.Functions.Common
         {
             log.LogInformation("EmailSender trigger function processed a request.");
 
-            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var emailMessage = JsonConvert.DeserializeObject<EmailMessage>(requestBody);
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            EmailMessage emailMessage = JsonConvert.DeserializeObject<EmailMessage>(requestBody);
 
-            if(emailMessage == null)
+            if (emailMessage == null)
+            {
                 return new NoContentResult();
+            }
 
-            var message = new SendGridMessage();
+            SendGridMessage message = new SendGridMessage();
             message.AddTo(emailMessage.To);
             message.AddContent("text/html", emailMessage.Content);
             message.SetFrom(new EmailAddress("stevan@kostoski.com"));
