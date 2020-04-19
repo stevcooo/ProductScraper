@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace ProductScraper.Services.Implementations
 {
-    public class EmailSender : IEmailSender
+    public class EmailService : IEmailService
     {
         private readonly IOptions<AppSettings> _settings;
         private readonly IHttpHandlerService _httpHandlerService;
 
-        public EmailSender(IOptions<AppSettings> settings,
+        public EmailService(IOptions<AppSettings> settings,
             IHttpHandlerService httpHandlerService)
         {
             _settings = settings;

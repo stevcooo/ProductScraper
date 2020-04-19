@@ -1,22 +1,18 @@
-using HtmlAgilityPack;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
 using ProductScraper.Common.Naming;
+using ProductScraper.Functions.Common;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.Extensions;
 using ProductScraper.Models.ViewModels;
-using System;
 using System.Linq;
-using System.Net;
 using System.Text;
 
 namespace ProductScraper.Functions.ScrapeFunctions
 {
     public static class ScrapeUserProducts
     {
-        private static readonly WebClient _webClient = new WebClient();
-
         [FunctionName(FunctionName.ScrapeUserProducts)]
         public static async void Run(
             [QueueTrigger(QueueName.UsersReadyForNotifications, Connection = CommonName.Connection)]UserProfile userProfile,
@@ -55,7 +51,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 if (config != null)
                 {
                     log.LogInformation($"ScrapeConfig : {config.Name}");
-                    Scrape(config, product, log);
+                    await Utils.Scrape(config, product, log);
                     //Update product in db
                     TableOperation operation = TableOperation.InsertOrReplace(product);
                     await productInfoTable.ExecuteAsync(operation);
@@ -82,110 +78,6 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 emailMessage = new EmailMessage(userProfile.UserId, "Products updates", "None of your products has been updated/changed since last check.");
                 await emailMessageQueue.AddAsync(emailMessage);
             }
-        }
-
-        private static void Scrape(ScrapeConfig scrapeConfig, ProductInfo product, ILogger log)
-        {
-            if (string.IsNullOrWhiteSpace(product.URL))
-            {
-                log.LogInformation("URL can not be empty!");
-                return;
-            }
-
-            string html = _webClient.DownloadString(product.URL);
-            HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(html);
-
-            product.HasChangesSinceLastTime = false;
-
-            try
-            {
-                HtmlNode titleNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductNamePath);
-                if (titleNode != null && product.Name != titleNode.InnerText)
-                {
-                    product.HasChangesSinceLastTime = true;
-                    product.Name = titleNode.InnerText;
-                }
-            }
-            catch (Exception ex)
-            {
-                log.LogInformation(ex.Message);
-            }
-
-            try
-            {
-                HtmlNode priceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductPricePath);
-                if (priceNode != null && product.Price != priceNode.InnerText)
-                {
-                    product.HasChangesSinceLastTime = true;
-                    product.Price = priceNode.InnerText;
-                }
-            }
-            catch (Exception ex)
-            {
-                log.LogInformation(ex.Message);
-            }
-
-
-            try
-            {
-                HtmlNode secondPriceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductSecondPricePath);
-                if (secondPriceNode != null && product.SecondPrice != secondPriceNode.InnerText)
-                {
-                    product.HasChangesSinceLastTime = true;
-                    product.SecondPrice = secondPriceNode.InnerText;
-                }
-            }
-            catch (Exception ex)
-            {
-                log.LogInformation(ex.Message);
-            }
-
-            try
-            {
-                HtmlNode availabilityNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductAvailabilityPath);
-                if (availabilityNode != null)
-                {
-                    bool isAviliable = false;
-
-                    if (scrapeConfig.ProductAvailabilityIsAtributeValue)
-                    {
-                        HtmlAttribute attr = availabilityNode.Attributes.FirstOrDefault(t => t.Value == scrapeConfig.ProductAvailabilityValue);
-                        if (attr != null)
-                        {
-                            isAviliable = true;
-                        }
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(scrapeConfig.ProductAvailabilityValue) && availabilityNode.InnerText == scrapeConfig.ProductAvailabilityValue)
-                        {
-                            isAviliable = true;
-                        }
-                        else
-                        {
-                            isAviliable = availabilityNode != null;
-                        }
-
-                    }
-
-                    if (product.Availability != isAviliable)
-                    {
-                        product.HasChangesSinceLastTime = true;
-                        product.Availability = isAviliable;
-                    }
-                }
-                else
-                {
-                    product.Availability = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                //Log the exception
-                log.LogInformation(ex.Message);
-            }
-            product.LastCheckedOn = DateTime.UtcNow;
         }
     }
 }

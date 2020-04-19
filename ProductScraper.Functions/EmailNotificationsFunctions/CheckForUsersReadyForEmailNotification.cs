@@ -11,7 +11,7 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
     {
         [FunctionName(FunctionName.CheckForUsersReadyForEmailNotification)]
         //"0 0 */2 * * *"	once every two hours
-        public static async void Run([TimerTrigger("0 0 */2 * * *")]TimerInfo timerInfo,
+        public static async void Run([TimerTrigger("0 0 11 * * *")]TimerInfo timerInfo,
             [Table(TableName.UserProfile)] CloudTable userProfileTable,
             [Queue(QueueName.UsersReadyForNotifications)] IAsyncCollector<UserProfile> usersReadyForNotificationsQueue,
             ILogger log)
