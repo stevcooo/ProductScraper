@@ -62,32 +62,35 @@ Whenever users are involved in a web application, there is always a need to be a
 
 # Azure resources
 I've mentioned a few Azure services. To be able to reproduce this solution you will need to use several Azure resources. 
-## Creating Azure functions
-For the Azure functions you'll need to create a [Function App](https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites/kind/functionapp). In the process of creating the Function App, in the Hosting step you will be asked to create a Storage Account if you don't have one created previously, just type the name and the wizard will create it for you. You can see mine in the screenshots below. Once created you can check your (Storage account here)[https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Storage%2FStorageAccounts]. You need this Storage Account for the Tables and Queues that we will be using in this tutorial. For the PlanType, also on the Hosting tab, I've selected Consumption(serverless) because that was the cheapest one that will serve the needs of this application. Please be aware always before creating an Azure resource to check it's pricing because it maybe will be too expensive or will not be compatible with the needs of your product/application.
-
-    SCREENSHOT
+## Azure function
+For the Azure functions you'll need to create a [Function App](https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites/kind/functionapp). In the process of creating the Function App, in the Hosting step you will be asked to create a Storage Account if you don't have one created previously, just type the name and the wizard will create it for you. You can see mine in the screenshots below. Once created you can check your [Storage account here](https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Storage%2FStorageAccounts). You need this Storage Account for the Tables and Queues that we will be using in this tutorial. For the PlanType, also on the Hosting tab, I've selected Consumption(serverless) because that was the cheapest one that will serve the needs of this application. Please be aware always before creating an Azure resource to check it's pricing because it maybe will be too expensive or will not be compatible with the needs of your product/application.
+ 
+![Function app](Images/FunctionApp.png)  
+![Function app](Images/StorageAccount.png)
 
 ## Send grid
-Also, I mentioned SendGrid, to be able to send emails using the Azure functions, you will need a SendGrid account, you can create one via Azure resources or create one directly on their website. Once you have created the SendGrid account, you need to obtain an ApiKey that will associate the FunctionApp with your SendGrid account (if you have any questions on this please let me know). Once you have the SendGridApiKey you will need to add to the Azure Functions Configuration settings (check the screenshot).
+Also, I mentioned SendGrid, to be able to send emails using the Azure functions, you will need a SendGrid account, you can create one via Azure resources or create one directly on their website. Once you have created the SendGrid account, you need to obtain an ApiKey that will associate the FunctionApp with your SendGrid account (if you have any questions on this please let me know). Once you have the SendGridApiKey you will need to add to the Azure Functions Configuration settings (check the screenshots).
 
-    SCREENSHOT
+![Function app](Images/AzureFunctionConfigurationLink.png)    
+![Function app](Images/SendGridApiKeyConfiguration.png)
 
 ## App service
-In the end, you will need an App Service or a place where you can host your website that will interact with the Azure Functions. Of course, you can host your web application anywhere and still communicate with the Azure Functions, but in this example a tired to stick with Azure services, so I've created AppService and hosted my .net core application here. Creating an App service is pretty straight forward wizard, be careful with the pricing tiers (App service plan), I've chosen the free option, but of course, there are lot more other plans that you can use to scale your application.
-
-    SCREENSHOT
+In the end, you will need an App Service or a place where you can host your website that will interact with the Azure Functions. Of course, you can host your web application anywhere and still communicate with the Azure Functions, but in this example a tired to stick with Azure services, so I've created AppService and hosted my .net core application here. Creating an App service is pretty straight forward wizard, be careful with the pricing tiers (App service plan), I've chosen the free option, but of course, there are lot more other plans that you can use to scale your application.  
+![Function app](Images/AppService.png)  
 
 ## Application Insights
-Application Insights it's a nice way to track the health of your Function App or App Service, here you can see a lot of useful info related to the Availablity, errors, Failed Request, Server response time, Server Request and many many more things. I've created two Application Insights services, one for the Azure Function and one for the App service.
-
-    SCREENSHOT
+Application Insights it's a nice way to track the health of your Function App or App Service, here you can see a lot of useful info related to the Availablity, errors, Failed Request, Server response time, Server Request and many many more things. I've created two Application Insights services, one for the Azure Function and one for the App service.  
+![Function app](Images/ApplicationInsights.png)  
 
 ## Resource group
-An Azure resource group is like a namespace or folder or a group for Azure services, whenever you create a service there is a filed where you can choose on which resource group that service should belong. This is a nice thing to be able to group all your services that are related to the same project. This is extremely useful when you have several Applications ecosystems, you can easily track them and see all services that are related. For this demo, I've used the same resource group for all services, and now I can easily see all the services that I'm using for this ProductScraper project.
+An Azure resource group is like a namespace or folder or a group for Azure services, whenever you create a service there is a filed where you can choose on which resource group that service should belong. This is a nice thing to be able to group all your services that are related to the same project. This is extremely useful when you have several Applications ecosystems, you can easily track them and see all services that are related. For this demo, I've used the same resource group for all services, and now I can easily see all the services that I'm using for this ProductScraper project.  
 
-    SCREENSHOT
+![Function app](Images/resourceGroup.png)
 
 ## Cost Management + Billing
-The very important thing is when using online service where you have a play Pay-as-you-go, like in this case, to check your bill every few days to avoid big or unexpected costs. I've done this mistake once, I've ended up with a huge bill because I selected some pricing plan that I wasn't aware how much it will cost (Always check (Azure pricing)[https://azure.microsoft.com/en-us/pricing/calculator/], always! ). In this (section)[https://portal.azure.com/#blade/Microsoft_Azure_GTM/ModernBillingMenuBlade/Overview] you can check how much you have spent so far (if any) and witch service costs you how much.
+The very important thing is when using online service where you have a play Pay-as-you-go, 
+like in this case, to check your bill every few days to avoid big or unexpected costs. 
+I've done this mistake once, I've ended up with a huge bill because I selected some pricing plan that I wasn't aware how much it will cost 
+(Always check [Azure pricing](https://azure.microsoft.com/en-us/pricing/calculator/), always! ). In this [section](https://portal.azure.com/#blade/Microsoft_Azure_GTM/ModernBillingMenuBlade/Overview) you can check how much you have spent so far (if any) and witch service costs you how much.  
 
-    SCREENSHOT
+![Function app](Images/Costs.png)
