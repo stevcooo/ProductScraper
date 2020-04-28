@@ -43,10 +43,14 @@ namespace ProductScraper.Functions.Common
             try
             {
                 HtmlNode priceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductPricePath);
-                if (priceNode != null && product.Price != priceNode.InnerText)
+                if (priceNode != null)
                 {
-                    product.HasChangesSinceLastTime = true;
-                    product.Price = priceNode.InnerText.Replace("&nbsp;","");
+                    var newPrice = priceNode.InnerText.Replace("&nbsp;", "");
+                    if(product.Price != newPrice)
+                    {
+                        product.HasChangesSinceLastTime = true;
+                        product.Price = newPrice;
+                    }
                 }
             }
             catch (Exception ex)
@@ -60,8 +64,12 @@ namespace ProductScraper.Functions.Common
                 HtmlNode secondPriceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductSecondPricePath);
                 if (secondPriceNode != null && product.SecondPrice != secondPriceNode.InnerText)
                 {
-                    product.HasChangesSinceLastTime = true;
-                    product.SecondPrice = secondPriceNode.InnerText;
+                    var newSecondPrice = secondPriceNode.InnerText.Replace("&nbsp;", "");
+                    if (product.SecondPrice != newSecondPrice)
+                    {
+                        product.HasChangesSinceLastTime = true;
+                        product.SecondPrice = newSecondPrice;
+                    }
                 }
             }
             catch (Exception ex)
