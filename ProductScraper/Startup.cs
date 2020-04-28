@@ -61,7 +61,7 @@ namespace ProductScraper
             .AddDefaultTokenProviders()
             .AddDefaultUI()
             .CreateAzureTablesIfNotExists<ApplicationDbContext>(); //can remove after first run;
-            //.AddEntityFrameworkStores<ApplicationDbContext>();
+
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
 
