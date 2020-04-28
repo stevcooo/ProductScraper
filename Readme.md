@@ -109,7 +109,93 @@ I've done this mistake once, I've ended up with a huge bill because I selected s
 
 ![Function app](Images/Costs.png)
 *<center>Billing sample of my demo</center>*  
+  
+# Product scraper solution
+As I mentioned in the first sentence my idea was to build a product scraper that will collect products info and send me an email whenever there is a change in them. In the following context, I'll try to explain the most important things in the application, if something is unclear or there is no enough info provided please let me know. You can see in the repository that my solution is divided in 5 projects. I'll try to explain their purpose and the most important code in them.
 
+## ProductScraper web
+This is the web project. Here I configure the Identity settings to use `ElCamino.AspNetCore.Identity.AzureTable` NuGet package for user registration/aughentication/authorizatoin. 
+You can see this configuration in [`Startup.cs`](ProductScraper/Startup.cs) file in `ConfigureServices` method.
+```c#
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddDefaultIdentity<IdentityUser>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = false;
+            options.User.RequireUniqueEmail = true;
+            options.Password.RequireDigit = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireNonAlphanumeric = false;
+        })
+        //ElCamino configuration
+        .AddAzureTableStores<ApplicationDbContext>(new Func<IdentityConfiguration>(() =>
+        {
+            IdentityConfiguration idconfig = new IdentityConfiguration
+            {
+                TablePrefix = Configuration.GetSection("AzureTable:IdentityConfiguration:TablePrefix").Value,
+                StorageConnectionString = Configuration.GetSection("AzureTable:StorageConnectionString").Value,
+                LocationMode = Configuration.GetSection("AzureTable:IdentityConfiguration:LocationMode").Value,
+                IndexTableName = TableName.IdentityIndex, // default: AspNetIndex
+                RoleTableName = TableName.IdentityRoles,   // default: AspNetRoles
+                UserTableName = TableName.IdentityUsers   // default: AspNetUsers
+            };
+            return idconfig;
+        }))
+        .AddDefaultTokenProviders()
+        .AddDefaultUI()
+        .CreateAzureTablesIfNotExists<ApplicationDbContext>(); //can remove after first run;
+        
+        ...
+        ...
+    }
+```
 
-#Product scraper
-As 
+For more detailed info how to set this configuraiton you can check on the [official project site](https://dlmelendez.github.io/identityazuretable/#/).  
+
+  Also in [`Startup.cs`](ProductScraper/Startup.cs) file in `ConfigureServices` method there is configuration about the Azure table that I'm using. Here i add settings for each Azure table such as ConnectionString and TableName.
+##### ProductInfo table config
+```C#
+    services.AddScoped<IAzureTableStorage<ProductInfo>>(factory =>
+        {
+            return new AzureTableStorage<ProductInfo>(
+                new AzureTableSettings(
+                    storageConnectionString: Configuration.GetSection("AzureTable:StorageConnectionString").Value,
+                    tableName: TableName.ProductInfo));
+        });
+```
+##### ScrapeConfig table config
+```C#
+    services.AddScoped<IAzureTableStorage<ScrapeConfig>>(factory =>
+        {
+            return new AzureTableStorage<ScrapeConfig>(
+                new AzureTableSettings(
+                    storageConnectionString: Configuration.GetSection("AzureTable:StorageConnectionString").Value,
+                    tableName: TableName.ScrapeConfig));
+        });
+```
+##### UserProfile table config
+```C#
+    services.AddScoped<IAzureTableStorage<UserProfile>>(factory =>
+        {
+            return new AzureTableStorage<UserProfile>(
+                new AzureTableSettings(
+                    storageConnectionString: Configuration.GetSection("AzureTable:StorageConnectionString").Value,
+                    tableName: TableName.UserProfile));
+        });
+```
+
+Also, in this project, in the Identity section, when new user is registed, I'm creating a record in UserPfofile table, in this table, we will keep all the aditional info related to the users.
+You can see this in the [`Register.cshtml.cs`](ProductScraper/Areas/Identity/Pages/Account/Register.cshtml.cs) file in `OnPostAsync` method. Here is the code segment that is adding record to UserProfile table. You can note that Id value of IdentityUsers table record is used as Userid in UserProfile table, thats the link between this two tables.
+
+```C#
+UserProfile userProfile = new UserProfile
+    {
+        UserId = user.Id,
+        EnableEmailNotifications = true,
+        DaysBetweenEmailNotifications = 7
+    };
+    await _userProfileService.AddAsync(userProfile);
+```
+
+Also, in this project I've created two controllers, [`ProductsController.cs`](ProductScraper/Controllers/ProductsController.cs) and [`ScrapeConfigsController.cs`](ProductScraper/Controllers/ScrapeConfigsController.cs), they using the Services created in `ProductScraper.Services` project are interacting with the data, reading and writing to Azure tables or calling Azure functions.

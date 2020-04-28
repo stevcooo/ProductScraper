@@ -12,6 +12,5 @@ namespace ProductScraper.Data
         public ApplicationDbContext(IdentityConfiguration config) : base(config)
         {
         }
-
     }
 }

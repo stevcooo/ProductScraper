@@ -43,6 +43,10 @@ namespace ProductScraper
             {
                 options.SignIn.RequireConfirmedAccount = false;
                 options.User.RequireUniqueEmail = true;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
             })
             //ElCamino configuration
             .AddAzureTableStores<ApplicationDbContext>(new Func<IdentityConfiguration>(() =>
