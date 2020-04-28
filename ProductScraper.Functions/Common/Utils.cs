@@ -46,7 +46,7 @@ namespace ProductScraper.Functions.Common
                 if (priceNode != null && product.Price != priceNode.InnerText)
                 {
                     product.HasChangesSinceLastTime = true;
-                    product.Price = priceNode.InnerText;
+                    product.Price = priceNode.InnerText.Replace("&nbsp;","");
                 }
             }
             catch (Exception ex)

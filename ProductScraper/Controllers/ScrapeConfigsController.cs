@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProductScraper.Helpers;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Services.Interfaces;
 using System.Threading.Tasks;
@@ -54,6 +55,10 @@ namespace ProductScraper.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                scrapeConfig.ProductNamePath = scrapeConfig.ProductNamePath.RemoveSpecialCharacters();
+                scrapeConfig.ProductPricePath = scrapeConfig.ProductPricePath.RemoveSpecialCharacters();
+                scrapeConfig.ProductSecondPricePath = scrapeConfig.ProductSecondPricePath.RemoveSpecialCharacters();
+                scrapeConfig.ProductAvailabilityPath = scrapeConfig.ProductAvailabilityPath.RemoveSpecialCharacters();
                 await _scrapeConfigService.AddAsync(scrapeConfig);
                 return RedirectToAction(nameof(Index));
             }
@@ -91,6 +96,10 @@ namespace ProductScraper.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
+                scrapeConfig.ProductNamePath = scrapeConfig.ProductNamePath.RemoveSpecialCharacters();
+                scrapeConfig.ProductPricePath = scrapeConfig.ProductPricePath.RemoveSpecialCharacters();
+                scrapeConfig.ProductSecondPricePath = scrapeConfig.ProductSecondPricePath.RemoveSpecialCharacters();
+                scrapeConfig.ProductAvailabilityPath = scrapeConfig.ProductAvailabilityPath.RemoveSpecialCharacters();
                 await _scrapeConfigService.UpdateAsync(scrapeConfig);
                 return RedirectToAction(nameof(Index));
             }

@@ -8,6 +8,7 @@ using ProductScraper.Common.Naming;
 using ProductScraper.Functions.Common;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.Extensions;
+using SendGrid.Helpers.Mail;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,6 +21,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = FunctionName.ScrapeProduct + "/{userId}/{productId}")] HttpRequest req,
             [Table(TableName.ProductInfo, "{userId}")] CloudTable productInfoTable,
             [Table(TableName.ScrapeConfig)] CloudTable scrapeConfigTable,
+            [Queue(QueueName.EmailsToSend)] IAsyncCollector<SendGridMessage> emailMessageQueue,
             string userId,
             string productId,
             ILogger log)
@@ -37,16 +39,32 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, product.URL.ToCoreUrl()));
 
                 TableQuerySegment<ScrapeConfig> configs = await scrapeConfigTable.ExecuteQuerySegmentedAsync(configQuery, null);
-                if (configs != null && configs.Count() == 1)
+                if (!configs.Any())
+                {
+                    //Notify the admin
+                    SendGridMessage message = new SendGridMessage();
+                    message.SetFrom(new EmailAddress("info@productscrape.com", "Product scraper"));
+                    message.AddTo(CommonName.AdminEmail);
+                    message.SetSubject("Missing configuration");
+                    message.AddContent("text/plain", $"There was request for scraping products from {product.URL.ToCoreUrl()}, consider adding configuration soon.");
+                    await emailMessageQueue.AddAsync(message);
+                }
+                else if (configs.Count() > 1)
+                {
+                    //Notify the admin
+                    SendGridMessage message = new SendGridMessage();
+                    message.SetFrom(new EmailAddress("info@productscrape.com", "Product scraper"));
+                    message.AddTo(CommonName.AdminEmail);
+                    message.SetSubject("Multiple configurations");
+                    message.AddContent("text/plain", $"There are more than one configuration for: {product.URL.ToCoreUrl()}, consider deleting one.");
+                    await emailMessageQueue.AddAsync(message);
+                }
+                else if (configs.Count() == 1)
                 {
                     await Utils.Scrape(configs.First(), product, log);
                     //Update product in db
                     TableOperation operation = TableOperation.InsertOrReplace(product);
                     await productInfoTable.ExecuteAsync(operation);
-                }
-                else
-                {
-                    log.LogInformation($"Multiple scrape config matches the criteria URL={product.URL}");
                 }
             }
             else
