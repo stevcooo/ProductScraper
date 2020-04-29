@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProductScraper.Common.Naming;
 using ProductScraper.Helpers;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Services.Interfaces;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ProductScraper.Areas.Admin.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = Policy.AdminOnly)]
     public class ScrapeConfigsController : Controller
     {
         private readonly IScrapeConfigService _scrapeConfigService;

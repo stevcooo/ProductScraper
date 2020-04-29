@@ -15,18 +15,24 @@ namespace ProductScraper.Services.Implementations
             _repository = repository;
         }
 
+        public async Task<int> GetUsersCount()
+        {
+            var users = await _repository.GetList();
+            return users.Count;
+        }
+
         public async Task AddAsync(UserProfile userProfile)
         {
             userProfile.Id = DateTime.Now.Ticks;
             userProfile.RowKey = userProfile.Id.ToString();
             userProfile.PartitionKey = userProfile.UserId;
-            userProfile.LastNotificationEmailSendOn = DateTime.MinValue;
+            userProfile.LastNotificationEmailSendOn = DateTime.Now.AddDays(-1);
             await _repository.Insert(userProfile);
         }
 
         public async Task<UserProfile> GetByUserId(string userId)
         {
-            System.Collections.Generic.List<UserProfile> users = await _repository.GetList(userId);
+            var users = await _repository.GetList(userId);
             if (users.Count != 1)
             {
                 throw new Exception("Too many users!");

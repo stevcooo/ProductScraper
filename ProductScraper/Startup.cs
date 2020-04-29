@@ -12,6 +12,7 @@ using ProductScraper.Models.ViewModels;
 using ProductScraper.Services.Implementations;
 using ProductScraper.Services.Interfaces;
 using System;
+using System.Security.Claims;
 using IdentityUser = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityUser;
 
 namespace ProductScraper
@@ -68,6 +69,11 @@ namespace ProductScraper
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Policy.AdminOnly, policy => policy.RequireClaim(ClaimTypes.Role, ClaimValues.Admin));
+            });
 
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 

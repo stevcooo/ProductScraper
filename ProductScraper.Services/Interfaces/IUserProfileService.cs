@@ -8,5 +8,6 @@ namespace ProductScraper.Services.Interfaces
         Task<UserProfile> GetByUserId(string userId);
         Task AddAsync(UserProfile userProfile);
         Task UpdateAsync(UserProfile userProfile);
+        Task<int> GetUsersCount();
     }
 }

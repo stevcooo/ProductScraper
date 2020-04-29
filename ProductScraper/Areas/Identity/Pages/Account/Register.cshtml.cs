@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using ProductScraper.Common.Naming;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Services.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -91,6 +93,13 @@ namespace ProductScraper.Areas.Identity.Pages.Account
                         DaysBetweenEmailNotifications = 7
                     };
                     await _userProfileService.AddAsync(userProfile);
+
+                    //if it's the first user that creates account, give him admin Claim
+                    if (await _userProfileService.GetUsersCount() == 1) 
+                    {
+                        Claim claim = new Claim(ClaimTypes.Role, ClaimValues.Admin, ClaimValueTypes.String);
+                        await _userManager.AddClaimAsync(user, claim);
+                    }
 
                     string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
