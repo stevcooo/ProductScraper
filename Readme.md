@@ -197,5 +197,22 @@ UserProfile userProfile = new UserProfile
     };
     await _userProfileService.AddAsync(userProfile);
 ```
+Also, there is a need some user(s) to be administrator on this aplication in order to be able to create/edit/delete `ScrapeConfigurations`, so in that manner, where in this same method when user is created i'm checking if thats the first user that creates profile, if so, then I assing Admin claim to him.
+```C#
+    if (await _userProfileService.GetUsersCount() == 1) 
+    {
+        Claim claim = new Claim(ClaimTypes.Role, ClaimValues.Admin, ClaimValueTypes.String);
+        await _userManager.AddClaimAsync(user, claim);
+    }
+```
+To be able to authorize with Claims you need to add Authorization policy in [`Startup.cs`](ProductScraper/Startup.cs) file in `ConfigureServices` method 
+```C#
+    services.AddAuthorization(options =>
+    {
+        options.AddPolicy(Policy.AdminOnly, policy => policy.RequireClaim(ClaimTypes.Role, ClaimValues.Admin));
+    });
+```
+After you configure the policy for Admins, you can add `[Authorize(Policy = Policy.AdminOnly)]` before declaration of any controller or method in order to enforce this policy. I used this in [`ScrapeConfigsController.cs`](ProductScraper/Controllers/ScrapeConfigsController.cs).  
+Or if you want to use this inside a method, you can use `User.IsInRole(ProductScraper.Common.Naming.ClaimValues.Admin)`  
 
 Also, in this project I've created two controllers, [`ProductsController.cs`](ProductScraper/Controllers/ProductsController.cs) and [`ScrapeConfigsController.cs`](ProductScraper/Controllers/ScrapeConfigsController.cs), they using the Services created in `ProductScraper.Services` project are interacting with the data, reading and writing to Azure tables or calling Azure functions.
