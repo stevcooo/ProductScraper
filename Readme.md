@@ -216,3 +216,35 @@ After you configure the policy for Admins, you can add `[Authorize(Policy = Poli
 Or if you want to use this inside a method, you can use `User.IsInRole(ProductScraper.Common.Naming.ClaimValues.Admin)`  
 
 Also, in this project I've created two controllers, [`ProductsController.cs`](ProductScraper/Controllers/ProductsController.cs) and [`ScrapeConfigsController.cs`](ProductScraper/Controllers/ScrapeConfigsController.cs), they using the Services created in `ProductScraper.Services` project are interacting with the data, reading and writing to Azure tables or calling Azure functions.
+
+# ProductScraper.Common
+This is a small `netstandard2.0` project. Here I'll store all common things for all other projects. For example, to avoid using strings and magic numbers in the code, i place all of them here and then use them as a constant fields. That way when i change a name of a function, or a queue, i not need to check all code, i only change the name here in this project.  When you're using a functions and queues, it's easy to forgot the change a queue name in all functions that are related to that queue, but this aproach helps you to avoid that scenario.
+This is how i keep track of the table names:
+```C#
+    public static class TableName
+    {
+        public const string ProductInfo = "ProductInfo";
+        public const string ScrapeConfig = "ScrapeConfig";
+        public const string UserProfile = "UserProfile";
+
+        public const string IdentityIndex = "IdentityIndex";
+        public const string IdentityRoles = "IdentityRoles";
+        public const string IdentityUsers = "IdentityUsers";
+    }
+```  
+
+And this is how I use them later:  
+```C#
+    [FunctionName(FunctionName.ScrapeProduct)]
+    public static async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get", Route = FunctionName.ScrapeProduct + "/{userId}/{productId}")] HttpRequest req,
+        [Table(TableName.ProductInfo, "{userId}")] CloudTable productInfoTable,
+        [Table(TableName.ScrapeConfig)] CloudTable scrapeConfigTable,
+        [Queue(QueueName.EmailsToSend)] IAsyncCollector<SendGridMessage> emailMessageQueue,
+        string userId,
+        string productId,
+        ILogger log)
+    {
+        ...
+    }
+```
