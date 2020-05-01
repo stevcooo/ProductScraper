@@ -248,3 +248,22 @@ And this is how I use them later:
         ...
     }
 ```
+
+# ProductScraper.Functions
+This is the project where Azure functions are developed. I've developed three types of Azure functions, Htpp, Queue and Timer triggered.
+### Http triggered functions:
+- [`ScrapeProduct.cs`](ProductScraper.Functions/ScrapeFunctions/ScrapeProduct.cs)
+- [`GetAllScrapeConfigs.cs`](ProductScraper.Functions/ScrapeConfigFunctions/GetAllScrapeConfigs.cs)
+- [`GetScrapeConfig.cs`](ProductScraper.Functions/ScrapeConfigFunctions/GetScrapeConfig.cs)
+- [`AddScrapeConfig.cs`](ProductScraper.Functions/ScrapeConfigFunctions/AddScrapeConfig.cs)
+- [`UpdateScrapeConfig.cs`](ProductScraper.Functions/ScrapeConfigFunctions/UpdateScrapeConfig.cs)
+- [`DeleteScrapeConfig.cs`](ProductScraper.Functions/ScrapeConfigFunctions/DeleteScrapeConfig.cs)
+- [`EmailSender.cs`](ProductScraper.Functions/Common/EmailSender.cs)
+
+### Queue triggered functions:
+- [`EmailToSendGrid.cs`](ProductScraper.Functions/Common/EmailToSendGrid.cs)
+- [`GenerateProductUpdateEmail.cs`](ProductScraper.Functions/EmailNotificationsFunctions/GenerateProductUpdateEmail.cs)
+- [`ScrapeUserProducts.cs`](ProductScraper.Functions/ScrapeFunctions/ScrapeUserProducts.cs)
+
+### Timer triggered functions:
+- [`CheckForUsersReadyForEmailNotification.cs`](ProductScraper.Functions/EmailNotificationsFunctions/CheckForUsersReadyForEmailNotification.cs)
