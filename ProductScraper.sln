@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductScraper.Functions.Tests", "ProductScraper.Functions.Tests\ProductScraper.Functions.Tests.csproj", "{4FDB8AD4-1DCB-4B2F-8F6D-E4419E84F33F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Azure|Any CPU = Azure|Any CPU
@@ -59,6 +61,12 @@ Global
 		{15500699-AD5B-4EC1-B5C6-7CE1D23C0D4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15500699-AD5B-4EC1-B5C6-7CE1D23C0D4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15500699-AD5B-4EC1-B5C6-7CE1D23C0D4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FDB8AD4-1DCB-4B2F-8F6D-E4419E84F33F}.Azure|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FDB8AD4-1DCB-4B2F-8F6D-E4419E84F33F}.Azure|Any CPU.Build.0 = Debug|Any CPU
+		{4FDB8AD4-1DCB-4B2F-8F6D-E4419E84F33F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FDB8AD4-1DCB-4B2F-8F6D-E4419E84F33F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FDB8AD4-1DCB-4B2F-8F6D-E4419E84F33F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FDB8AD4-1DCB-4B2F-8F6D-E4419E84F33F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

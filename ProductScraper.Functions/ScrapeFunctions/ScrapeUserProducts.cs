@@ -40,7 +40,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
             TableQuerySegment<ScrapeConfig> allConfigs = await scrapeConfigTable.ExecuteQuerySegmentedAsync(configsQuery, null);
 
             EmailMessage emailMessage;
-            StringBuilder emailBodyBoulder = new StringBuilder();
+            StringBuilder emailBodyBuilder = new StringBuilder();
             
             log.LogInformation($"userProducts: {userProducts.Results.Count}");
             foreach (ProductInfo product in userProducts)
@@ -51,24 +51,25 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 if (config != null)
                 {
                     log.LogInformation($"ScrapeConfig : {config.Name}");
-                    await Utils.Scrape(config, product, log);
+                    await Utils.Scrape(config, product, log);                    
+                    if (product.HasChangesSinceLastTime)
+                    {
+                        emailBodyBuilder = Utils.CreateProductEmailLine(product);
+                        emailBodyBuilder.AppendLine();
+                    }
+
                     //Update product in db
                     TableOperation operation = TableOperation.InsertOrReplace(product);
                     await productInfoTable.ExecuteAsync(operation);
-                    if (product.HasChangesSinceLastTime)
-                    {
-                        //Add to Email
-                        emailBodyBoulder.AppendLine($"{product.Name} Price: {product.Price} / {product.SecondPrice} Availability: {product.Availability} CheckedOn: {product.LastCheckedOn}");
-                    }
                 }
                 else
                 {
                     log.LogInformation($"Multiple scrape config matches the criteria URL={product.URL}");
                 }
             }
-            if (emailBodyBoulder.Length > 0)
+            if (emailBodyBuilder.Length > 0)
             {
-                emailMessage = new EmailMessage(userProfile.UserId, "Products updates", emailBodyBoulder.ToString());
+                emailMessage = new EmailMessage(userProfile.UserId, "Products updates", emailBodyBuilder.ToString());
                 log.LogInformation($"EmailMessage Product updates");
                 await emailMessageQueue.AddAsync(emailMessage);
             }

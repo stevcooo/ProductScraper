@@ -4,6 +4,7 @@ using ProductScraper.Models.EntityModels;
 using System;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ProductScraper.Functions.Common
@@ -122,6 +123,22 @@ namespace ProductScraper.Functions.Common
                 log.LogInformation(ex.Message);
             }
             product.LastCheckedOn = DateTime.UtcNow;
+        }
+
+        public static StringBuilder CreateProductEmailLine(ProductInfo product)
+        {
+            var emailBodyBuilder = new StringBuilder();
+            emailBodyBuilder.Append($"<a href='{product.URL}' target='_blank'>{product.Name}</a> Price: {product.Price} ");
+
+            if (!string.IsNullOrEmpty(product.SecondPrice))
+                emailBodyBuilder.Append($"/{product.SecondPrice}");
+
+            if (product.Availability.HasValue)
+                emailBodyBuilder.Append($" Availability: {product.Availability}");
+
+            emailBodyBuilder.Append($" Checked on: { product.LastCheckedOn.ToShortDateString()}");
+
+            return emailBodyBuilder;
         }
     }
 }
