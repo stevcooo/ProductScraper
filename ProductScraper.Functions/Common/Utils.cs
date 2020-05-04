@@ -26,7 +26,7 @@ namespace ProductScraper.Functions.Common
             doc.LoadHtml(html);
 
             product.HasChangesSinceLastTime = false;
-
+            product.Currency = scrapeConfig.Currency;
             try
             {
                 HtmlNode titleNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductNamePath);
@@ -116,9 +116,6 @@ namespace ProductScraper.Functions.Common
 
             if (!string.IsNullOrEmpty(product.PreviousPrice))
                 emailBodyBuilder.Append($"previous price: {product.PreviousPrice} {product.Currency}");
-
-            if (!string.IsNullOrEmpty(product.Currency))
-                emailBodyBuilder.Append($"/{product.Currency}");
 
             if (product.Availability.HasValue)
                 emailBodyBuilder.Append($" Availability: {product.Availability}");
