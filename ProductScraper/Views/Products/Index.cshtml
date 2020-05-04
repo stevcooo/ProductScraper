@@ -19,7 +19,7 @@
                 Price
             </th>
             <th>
-                Second price
+                Currency
             </th>
             <th>
                 Available
@@ -46,7 +46,7 @@
                 @Html.DisplayFor(modelItem => item.Price)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SecondPrice)
+                @Html.DisplayFor(modelItem => item.Currency)
             </td>
             <td>
                 @if (item.Availability.HasValue)

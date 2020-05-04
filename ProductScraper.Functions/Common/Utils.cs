@@ -61,26 +61,6 @@ namespace ProductScraper.Functions.Common
                 log.LogInformation(ex.Message);
             }
 
-
-            try
-            {
-                HtmlNode secondPriceNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductSecondPricePath);
-                if (secondPriceNode != null && product.SecondPrice != secondPriceNode.InnerText)
-                {
-                    var newSecondPrice = secondPriceNode.InnerText.Replace("&nbsp;", "");
-                    if (product.SecondPrice != newSecondPrice)
-                    {
-                        product.HasChangesSinceLastTime = true;
-                        product.PreviousSecondPrice = product.SecondPrice;
-                        product.SecondPrice = newSecondPrice;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                log.LogInformation(ex.Message);
-            }
-
             try
             {
                 HtmlNode availabilityNode = doc.DocumentNode.SelectSingleNode(scrapeConfig.ProductAvailabilityPath);
@@ -129,23 +109,23 @@ namespace ProductScraper.Functions.Common
             product.LastCheckedOn = DateTime.UtcNow;
         }
 
-        public static StringBuilder CreateProductEmailLine(ProductInfo product)
+        public static string CreateProductEmailLine(ProductInfo product)
         {
             var emailBodyBuilder = new StringBuilder();
-            emailBodyBuilder.Append($"<a href='{product.URL}' target='_blank'>{product.Name}</a> Price: {product.Price} ");
+            emailBodyBuilder.Append($"<a href='{product.URL}' target='_blank'>{product.Name}</a> Price: {product.Price} {product.Currency} ");
 
             if (!string.IsNullOrEmpty(product.PreviousPrice))
-                emailBodyBuilder.Append($"previous price: {product.PreviousPrice}");
+                emailBodyBuilder.Append($"previous price: {product.PreviousPrice} {product.Currency}");
 
-            if (!string.IsNullOrEmpty(product.SecondPrice))
-                emailBodyBuilder.Append($"/{product.SecondPrice}");
+            if (!string.IsNullOrEmpty(product.Currency))
+                emailBodyBuilder.Append($"/{product.Currency}");
 
             if (product.Availability.HasValue)
                 emailBodyBuilder.Append($" Availability: {product.Availability}");
 
             emailBodyBuilder.Append($" Checked on: { product.LastCheckedOn.ToShortDateString()}");
 
-            return emailBodyBuilder;
+            return emailBodyBuilder.ToString();
         }
     }
 }

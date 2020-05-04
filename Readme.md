@@ -267,3 +267,19 @@ This is the project where Azure functions are developed. I've developed three ty
 
 ### Timer triggered functions:
 - [`CheckForUsersReadyForEmailNotification.cs`](ProductScraper.Functions/EmailNotificationsFunctions/CheckForUsersReadyForEmailNotification.cs)
+
+## Scraping
+Initial idea of this project was web scraping. Whole scraping logic in located in this project in `Scrape` method in `Utils` class. 
+I'm using [`HtmlAgilityPack`](https://html-agility-pack.net) here to do all the web scraping. It's a really nice package with tons of features and handles the web scraping very well in my experience. In order to scrape info from web site, we need to configure witch info is important for us, in this case Name, Price and Availability. 
+Because every website has it's own layout, we will create Config for each domain that we want to scrape info from. I've created a video where I show how to add configuration for a website.
+###LINK TO VIDEO###
+
+### Automatic scraping
+Everytime user adds a new product in his list of products, the scrape method is run in the background to collect all the data about that link. If currenty there is no configuraiton for that website an email will be send to the administrator to create configuration for that website.
+Also, here we use the Time triggered function, witch occurs on constant intervals and checks for each user if scraping should be performed based on his scheddule perferences, should it be every day, every month or other. If so, then for each of his products we run the `Scrape` method to check if there is any change in the product details from previous time.
+You can see the flow in this chart:  
+###IMAGE HERE###
+
+### Manual scraping
+User can also manualy check for product changes when he opens the webpage, and in the list of the product, there is a `Check` button, witch invokes the Scrape function.  
+###IMAGE HERE###

@@ -52,13 +52,13 @@ namespace ProductScraper.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,URL,ProductNamePath,ProductPricePath,ProductSecondPricePath,ProductAvailabilityPath,ProductAvailabilityValue,ProductAvailabilityIsAtributeValue")] ScrapeConfig scrapeConfig)
+        public async Task<IActionResult> Create([Bind("Name,URL,ProductNamePath,ProductPricePath,Currency,ProductAvailabilityPath,ProductAvailabilityValue,ProductAvailabilityIsAtributeValue")] ScrapeConfig scrapeConfig)
         {
             if (ModelState.IsValid)
             {
                 scrapeConfig.ProductNamePath = scrapeConfig.ProductNamePath.RemoveSpecialCharacters();
                 scrapeConfig.ProductPricePath = scrapeConfig.ProductPricePath.RemoveSpecialCharacters();
-                scrapeConfig.ProductSecondPricePath = scrapeConfig.ProductSecondPricePath.RemoveSpecialCharacters();
+                scrapeConfig.Currency = scrapeConfig.Currency;
                 scrapeConfig.ProductAvailabilityPath = scrapeConfig.ProductAvailabilityPath.RemoveSpecialCharacters();
                 await _scrapeConfigService.AddAsync(scrapeConfig);
                 return RedirectToAction(nameof(Index));
@@ -88,7 +88,7 @@ namespace ProductScraper.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Edit/{partitionKey}/{rowKey}")]
-        public async Task<IActionResult> Edit(long id, [Bind("PartitionKey,RowKey,Id,Name,URL,ProductNamePath,ProductPricePath,ProductSecondPricePath,ProductAvailabilityPath,ProductAvailabilityValue,ProductAvailabilityIsAtributeValue")] ScrapeConfig scrapeConfig)
+        public async Task<IActionResult> Edit(long id, [Bind("PartitionKey,RowKey,Id,Name,URL,ProductNamePath,ProductPricePath,Currency,ProductAvailabilityPath,ProductAvailabilityValue,ProductAvailabilityIsAtributeValue")] ScrapeConfig scrapeConfig)
         {
             if (id != scrapeConfig.Id)
             {
@@ -99,7 +99,7 @@ namespace ProductScraper.Areas.Admin.Controllers
             {
                 scrapeConfig.ProductNamePath = scrapeConfig.ProductNamePath.RemoveSpecialCharacters();
                 scrapeConfig.ProductPricePath = scrapeConfig.ProductPricePath.RemoveSpecialCharacters();
-                scrapeConfig.ProductSecondPricePath = scrapeConfig.ProductSecondPricePath.RemoveSpecialCharacters();
+                scrapeConfig.Currency = scrapeConfig.Currency;
                 scrapeConfig.ProductAvailabilityPath = scrapeConfig.ProductAvailabilityPath.RemoveSpecialCharacters();
                 await _scrapeConfigService.UpdateAsync(scrapeConfig);
                 return RedirectToAction(nameof(Index));

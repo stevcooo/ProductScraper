@@ -45,7 +45,6 @@ namespace ProductScraper.Functions.ScrapeFunctions
             log.LogInformation($"userProducts: {userProducts.Results.Count}");
             foreach (ProductInfo product in userProducts)
             {
-
                 //Find config from allConfigs
                 ScrapeConfig config = allConfigs.FirstOrDefault(t => t.PartitionKey.Equals(product.URL.ToCoreUrl()));                
                 if (config != null)
@@ -54,8 +53,9 @@ namespace ProductScraper.Functions.ScrapeFunctions
                     await Utils.Scrape(config, product, log);                    
                     if (product.HasChangesSinceLastTime)
                     {
-                        emailBodyBuilder = Utils.CreateProductEmailLine(product);
-                        emailBodyBuilder.AppendLine();
+                        var productUpdateLine = Utils.CreateProductEmailLine(product);
+                        emailBodyBuilder.AppendLine(productUpdateLine);
+                        emailBodyBuilder.AppendLine("<br>");
                     }
 
                     //Update product in db
@@ -69,6 +69,10 @@ namespace ProductScraper.Functions.ScrapeFunctions
             }
             if (emailBodyBuilder.Length > 0)
             {
+                emailBodyBuilder.AppendLine();
+                emailBodyBuilder.AppendLine("<br>");
+                emailBodyBuilder.AppendLine("<br>");
+                emailBodyBuilder.AppendLine("<a href='https://product-scrape.azurewebsites.net/Products'>Here you can see the list of your products</a>");            
                 emailMessage = new EmailMessage(userProfile.UserId, "Products updates", emailBodyBuilder.ToString());
                 log.LogInformation($"EmailMessage Product updates");
                 await emailMessageQueue.AddAsync(emailMessage);
