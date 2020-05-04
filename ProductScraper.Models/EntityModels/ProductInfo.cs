@@ -7,17 +7,21 @@ namespace ProductScraper.Models.EntityModels
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        public string PreviousName { get; set; }
         [Required]
         [Url]
         public string URL { get; set; }
         public string Price { get; set; }
+        public string PreviousPrice { get; set; }
         public string SecondPrice { get; set; }
+        public string PreviousSecondPrice { get; set; }
         public bool? Availability { get; set; }
+        public bool? PreviousAvailability { get; set; }
         public DateTime LastCheckedOn { get; set; }
         public bool HasChangesSinceLastTime { get; set; }
 
         public virtual UserProfile UserProfile { get; set; }
-        public virtual long UserProfileId { get; set; }
+        public virtual long UserProfileId { get; set; }        
 
         public ProductInfo()
         {

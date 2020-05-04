@@ -33,6 +33,7 @@ namespace ProductScraper.Functions.Common
                 if (titleNode != null && product.Name != titleNode.InnerText)
                 {
                     product.HasChangesSinceLastTime = true;
+                    product.PreviousName = product.Name;
                     product.Name = titleNode.InnerText;
                 }
             }
@@ -50,6 +51,7 @@ namespace ProductScraper.Functions.Common
                     if(product.Price != newPrice)
                     {
                         product.HasChangesSinceLastTime = true;
+                        product.PreviousPrice = product.Price;
                         product.Price = newPrice;
                     }
                 }
@@ -69,6 +71,7 @@ namespace ProductScraper.Functions.Common
                     if (product.SecondPrice != newSecondPrice)
                     {
                         product.HasChangesSinceLastTime = true;
+                        product.PreviousSecondPrice = product.SecondPrice;
                         product.SecondPrice = newSecondPrice;
                     }
                 }
@@ -109,6 +112,7 @@ namespace ProductScraper.Functions.Common
                     if (product.Availability != isAviliable)
                     {
                         product.HasChangesSinceLastTime = true;
+                        product.PreviousAvailability = product.Availability;
                         product.Availability = isAviliable;
                     }
                 }
@@ -129,6 +133,9 @@ namespace ProductScraper.Functions.Common
         {
             var emailBodyBuilder = new StringBuilder();
             emailBodyBuilder.Append($"<a href='{product.URL}' target='_blank'>{product.Name}</a> Price: {product.Price} ");
+
+            if (!string.IsNullOrEmpty(product.PreviousPrice))
+                emailBodyBuilder.Append($"previous price: {product.PreviousPrice}");
 
             if (!string.IsNullOrEmpty(product.SecondPrice))
                 emailBodyBuilder.Append($"/{product.SecondPrice}");
