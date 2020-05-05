@@ -1,12 +1,3 @@
-
----
-title: Azure Functions, Queues and Table storage a.k.a Serverless architecture trough example
-published: false  
-description:  
-tags: Azure, Functions, Serverless, net core  
-
----
-
 # Azure Functions, Queues and Table storage a.k.a Serverless architecture trough example
 ---
 
