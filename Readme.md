@@ -67,7 +67,7 @@ Whenever users are involved in a web application, there is always a need to be a
 # Azure resources
 I've mentioned a few Azure services. To be able to reproduce this solution you will need to use several Azure resources. 
 ## Azure function
-For the Azure functions you'll need to create a [Function App](https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites/kind/functionapp). In the process of creating the Function App, in the Hosting step you will be asked to create a Storage Account if you don't have one created previously, just type the name and the wizard will create it for you. You can see mine in the screenshots below. Once created you can check your [Storage account here](https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Storage%2FStorageAccounts). You need this Storage Account for the Tables and Queues that we will be using in this tutorial. For the PlanType, also on the Hosting tab, I've selected Consumption(serverless) because that was the cheapest one that will serve the needs of this application. Please be aware always before creating an Azure resource to check it's pricing because it maybe will be too expensive or will not be compatible with the needs of your product/application.
+For the Azure functions, you'll need to create a [Function App](https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites/kind/functionapp). In the process of creating the Function App, in the Hosting step, you will be asked to create a Storage Account if you don't have one created previously, just type the name and the wizard will create it for you. You can see mine in the screenshots below. Once created you can check your [Storage account here](https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Storage%2FStorageAccounts). You need this Storage Account for the Tables and Queues that we will be using in this tutorial. For the PlanType, also on the Hosting tab, I've selected Consumption(serverless) because that was the cheapest one that will serve the needs of this application. Please be aware always before creating an Azure resource to check it's pricing because it maybe will be too expensive or will not be compatible with the needs of your product/application.
  
 ![Function app](Images/FunctionApp.png)  
 *<center>Fuction app that I'm using in this demo</center>*
@@ -111,10 +111,10 @@ I've done this mistake once, I've ended up with a huge bill because I selected s
 *<center>Billing sample of my demo</center>*  
   
 # Product scraper solution
-As I mentioned in the first sentence my idea was to build a product scraper that will collect products info and send me an email whenever there is a change in them. In the following context, I'll try to explain the most important things in the application, if something is unclear or there is no enough info provided please let me know. You can see in the repository that my solution is divided in 5 projects. I'll try to explain their purpose and the most important code in them.
+As I mentioned in the first sentence my idea was to build a product scraper that will collect products info and send me an email whenever there is a change in them. In the following context, I'll try to explain the most important things in the application, if something is unclear or there is no enough info provided please let me know. You can see in the repository that my solution is divided into 5 projects. I'll try to explain their purpose and the most important code in them.
 
 ## ProductScraper web
-This is the web project. Here I configure the Identity settings to use `ElCamino.AspNetCore.Identity.AzureTable` NuGet package for user registration/aughentication/authorizatoin. 
+This is a web project. Here I configure the Identity settings to use [`ElCamino.AspNetCore.Identity.AzureTable`](https://www.nuget.org/packages/ElCamino.AspNetCore.Identity.AzureTable/) NuGet package for user registration/authentication/authorization. 
 You can see this configuration in [`Startup.cs`](ProductScraper/Startup.cs) file in `ConfigureServices` method.
 ```c#
     public void ConfigureServices(IServiceCollection services)
@@ -151,9 +151,9 @@ You can see this configuration in [`Startup.cs`](ProductScraper/Startup.cs) file
     }
 ```
 
-For more detailed info how to set this configuraiton you can check on the [official project site](https://dlmelendez.github.io/identityazuretable/#/).  
+For more detailed info on how to set this configuration, you can check on the [official project site](https://dlmelendez.github.io/identityazuretable/#/).  
 
-  Also in [`Startup.cs`](ProductScraper/Startup.cs) file in `ConfigureServices` method there is configuration about the Azure table that I'm using. Here i add settings for each Azure table such as ConnectionString and TableName.
+  Also in [`Startup.cs`](ProductScraper/Startup.cs) file in `ConfigureServices` method there is configuration about the Azure table that I'm using. Here I add settings for each Azure table such as ConnectionString and TableName.
 ##### ProductInfo table config
 ```C#
     services.AddScoped<IAzureTableStorage<ProductInfo>>(factory =>
@@ -185,8 +185,8 @@ For more detailed info how to set this configuraiton you can check on the [offic
         });
 ```
 
-Also, in this project, in the Identity section, when new user is registed, I'm creating a record in UserPfofile table, in this table, we will keep all the aditional info related to the users.
-You can see this in the [`Register.cshtml.cs`](ProductScraper/Areas/Identity/Pages/Account/Register.cshtml.cs) file in `OnPostAsync` method. Here is the code segment that is adding record to UserProfile table. You can note that Id value of IdentityUsers table record is used as Userid in UserProfile table, thats the link between this two tables.
+Also, in this project, in the Identity section, when a new user is registered, I'm creating a record in UserPfofile table, in this table, we will keep all the additional info related to the users. You can see this in the 
+[`Register.cshtml.cs`](ProductScraper/Areas/Identity/Pages/Account/Register.cshtml.cs) file in OnPostAsync method. Here is the code segment that is adding a record to the UserProfile table. You can note that Id value of IdentityUsers table record is used as Userid in UserProfile table, that's the link between these two tables.
 
 ```C#
 UserProfile userProfile = new UserProfile
@@ -197,7 +197,7 @@ UserProfile userProfile = new UserProfile
     };
     await _userProfileService.AddAsync(userProfile);
 ```
-Also, there is a need some user(s) to be administrator on this aplication in order to be able to create/edit/delete `ScrapeConfigurations`, so in that manner, where in this same method when user is created i'm checking if thats the first user that creates profile, if so, then I assing Admin claim to him.
+Also, there is a need some user(s) to be an administrator on this application to be able to create/edit/delete `ScrapeConfigurations`, so in that manner, were in this same method when a user is created I'm checking if that's the first user that creates a profile, if so, then I assign Admin claim to him.
 ```C#
     if (await _userProfileService.GetUsersCount() == 1) 
     {
@@ -212,14 +212,14 @@ To be able to authorize with Claims you need to add Authorization policy in [`St
         options.AddPolicy(Policy.AdminOnly, policy => policy.RequireClaim(ClaimTypes.Role, ClaimValues.Admin));
     });
 ```
-After you configure the policy for Admins, you can add `[Authorize(Policy = Policy.AdminOnly)]` before declaration of any controller or method in order to enforce this policy. I used this in [`ScrapeConfigsController.cs`](ProductScraper/Controllers/ScrapeConfigsController.cs).  
+After you configure the policy for Admins, you can add `[Authorize(Policy = Policy.AdminOnly)]` before the declaration of any controller or method in order to enforce this policy. I used this in [`ScrapeConfigsController.cs`](ProductScraper/Controllers/ScrapeConfigsController.cs).  
 Or if you want to use this inside a method, you can use `User.IsInRole(ProductScraper.Common.Naming.ClaimValues.Admin)`  
 
 Also, in this project I've created two controllers, [`ProductsController.cs`](ProductScraper/Controllers/ProductsController.cs) and [`ScrapeConfigsController.cs`](ProductScraper/Controllers/ScrapeConfigsController.cs), they using the Services created in `ProductScraper.Services` project are interacting with the data, reading and writing to Azure tables or calling Azure functions.
 
 # ProductScraper.Common
-This is a small `netstandard2.0` project. Here I'll store all common things for all other projects. For example, to avoid using strings and magic numbers in the code, i place all of them here and then use them as a constant fields. That way when i change a name of a function, or a queue, i not need to check all code, i only change the name here in this project.  When you're using a functions and queues, it's easy to forgot the change a queue name in all functions that are related to that queue, but this aproach helps you to avoid that scenario.
-This is how i keep track of the table names:
+This is a small `netstandard2.0` project. Here I'll store all the common things for all other projects. For example, to avoid using strings and magic numbers in the code, I place all of them here and then use them as a constant field. That way when I change the name of a function, or a queue, I don't need to check all code, I only change the name here in this project. When you're using functions and queues, it's easy to forget the change a queue name in all functions that are related to that queue, but this approach helps you to avoid that scenario. This is how I keep track of the table names:
+This is how I keep track of the table names:
 ```C#
     public static class TableName
     {
@@ -269,33 +269,34 @@ This is the project where Azure functions are developed. I've developed three ty
 - [`CheckForUsersReadyForEmailNotification.cs`](ProductScraper.Functions/EmailNotificationsFunctions/CheckForUsersReadyForEmailNotification.cs)
 
 ## Scraping
-Initial idea of this project was web scraping. Whole scraping logic in located in this project in `Scrape` method in [`Utils.cs`](ProductScraper.Functions/Common/Utils.cs) class. 
-I'm using [`HtmlAgilityPack`](https://html-agility-pack.net) here to do all the web scraping. It's a really nice package with tons of features and handles the web scraping very well in my experience. In order to scrape info from web site, we need to configure witch info is important for us, in this case Name, Price and Availability. 
-Because every website has it's own layout, we will create Config for each domain that we want to scrape info from. I've created a video where I show how to add configuration for a website.
+The initial idea of this project was web scraping. Whole scraping logic is located in this project in `Scrape` method in [`Utils.cs`](ProductScraper.Functions/Common/Utils.cs) class. 
+I'm using [`HtmlAgilityPack`](https://html-agility-pack.net) here to do all the web scraping. It's a really nice package with tons of features and handles the web scraping very well in my experience. In order to scrape info from the web site, we need to configure witch info is important for us, in this case, Name, Price and Availability. 
+Because every website has it's own layout, we will create Config for each domain that we want to scrape info from. I've created a video where I show how to add configuration for a website.  
 ###LINK TO VIDEO###
 
 ### Automatic scraping
-Everytime user adds a new product in his list of products, the scrape method is run in the background to collect all the data about that link. If currenty there is no configuraiton for that website an email will be send to the administrator to create configuration for that website.
-Also, here we use the Time triggered function, witch occurs on constant intervals and checks for each user if scraping should be performed based on his scheddule perferences, should it be every day, every month or other. If so, then for each of his products we run the `Scrape` method to check if there is any change in the product details from previous time.  
-You can see the flow in this chart:    
+Every time user adds a new product in his list of products, the scraping method is run in the background to collect all the data about that link. If currently there is no configuration for that website an email will be sent to the administrator to create a configuration for that website.
+Also, here we use the Time triggered function, witch occurs on constant intervals and checks for each user if scraping should be performed based on his schedule preferences, should it be every day, every month or other. If so, then for each of his products we run the `Scrape` method to check if there is any change in the product details from the previous time.  
+You can see the flow in this chart:  
+
+
 ![Function app](Diagrams/AutomaticScraping.png)
 *<center>Automatic scraping using Time triggered function</center>*  
 
 ### Manual scraping
-User can also manualy check for product changes when he opens the webpage, and in the list of the product, there is a `Check` button, witch invokes the Scrape function.  
-###IMAGE HERE###
+User can also manually check for product changes when he opens the webpage, and in the list of the product, there is a `Check` button, which invokes the Scrape function.  
 ![Function app](Images/manualCheckButton.png)
 *<center>Manual scraping</center>*  
 
 
 # ProductScraper.Functions.Tests
-This is obviusly project where I put all the tests. There are not many tests, i need to update it. Basicly what is use this project for now is for manual testing my methods and configrations. Using tests you can easily check if some part of your code behavies like it should or not. Here I created few ScrapConfig configurations and i can easily check if they work or not. If i set this project as a step of continuious integration i can be sure that every configuraiton works without any problems, that saves a lot of pain and time.
+This is projected where I put all the tests. There are not many tests, I need to update it. Basically what is use this project, for now, is for manual testing my methods and configurations. Using tests you can easily check if some part of your code behaves like it should or not. Here I created a few ScrapConfig configurations and I can easily check if they work or not. If I set this project as a step of continuous integration I can be sure that every configuration works without any problems, that saves a lot of pain and time.
 
 # ProductScraper.Models
-Here i store all EntityModels, objects that should be saved into database, and all the ViewModels, objects that are used for data transfer between layers, but i's not stored anyware. One important thing amyt the entity models is that tye are all decendants of the `TableEntity` class, that is required in order to be able to be saved in AzureStorage tables.
+Here I store all EntityModels, objects that should be saved into the database, and all the ViewModels, objects that are used for data transfer between layers, but it's not stored anywhere. One important thing about the entity models is that they are all descendants of the `TableEntity` class, that is required to be able to be saved in AzureStorage tables.
 
 # ProductScraper.Services
-In this projects are all services that Web project is using to access the data. Every service has it's own `Interface` and `Implementation` they can be found in Interfaces and Implementations folders accordingly. As I mentioned above, here implemented two aproaces of the accessing azure storage data, one using `Functions` and the other one using direct access to Azure Table storages.  
+In these projects are all services that Web project is using to access the data. Every service has it's own `Interface` and `Implementation` they can be found in Interfaces and Implementations folders accordingly. As I mentioned above, here implemented two approaches of the accessing azure storage data, one using `Functions` and the other one using direct access to Azure Table storages.  
 ## Access data using Azure functions
 In [`ScrapeConfigService.cs`](ProductScraper.Services/Implementations/ScrapeConfigService.cs) you can see how i call Azure function in order to read/write data to Azure storage table.
 
