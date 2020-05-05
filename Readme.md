@@ -291,3 +291,28 @@ In [`ScrapeConfigService.cs`](ProductScraper.Services/Implementations/ScrapeConf
 
 ## Direct data access
 In [`ProductInfoService.cs`](ProductScraper.Services/Implementations/ProductInfoService.cs) you can see how i directly access Azure table using [`AzureTableStorage.cs`](ProductScraper.Services/Implementations/AzureTableStorage.cs) implementation of repository pattern. Here in this service i pass `AzureTableSettings` where all the table info is stored, in that way i can access Azure Storage Table.
+
+
+# Code and test Azure Functions locally
+If you prefer to skip creating Azure account, you can for sure test azure functions locally, just like you test your Web applications locally before you publish them. To be able to run Azure function locally please follow this link there detailed info is provided by Microsoft.  
+[Code and test Azure Functions locally](https://docs.microsoft.com/en-us/azure/azure-functions/functions-develop-local)
+
+# Azure Storage Explorer
+Is a very good tool which allows you to see what's inside your storage account, witch tables are created, witch queues are there and messages that are enqueued. It also offers you to review your local storage account. For more info please check the link below.  
+[Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
+
+# Running the solution
+When you clone this repository you should be able to open the solution using VisualStudio. You can check the web project by setting `ProductScraper` as a startup project, or you can test the functions using Postman or other API testing tool, by setting `ProductScraper.Functions` project as a startup project.
+There is also an option to run them both and to be able to test the whole workflow. To do so, you need to do a right-click on the solution and choose `Set Startup Projects...` and then, on the screen that appears, choose Multiple startup projects and then in the list, choose to Start as an option for `ProductScraper` and `ProductScraper.Functions`,. Now when you click Oon start or F5, both project will start and you can test the solution.  and `ProductScraper.Functions`,. Now when you click Oon start or F5, both project will start and you can test the solution.  
+
+![Function app](Images/SetUpMultipleStartUpProjects.png)  
+*<center>Set startup projects</center>*  
+
+![Function app](Images/MultipleStartUpProjects.png)  
+*<center>Choose which projects to start</center>*  
+
+# Contact info
+If you have any troubles or questions with the content of this blog, please feel free to contact me via email stevan[at]kostoski.com
+
+
+# Happy coding!
