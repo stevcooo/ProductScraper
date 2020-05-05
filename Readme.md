@@ -276,13 +276,16 @@ Because every website has it's own layout, we will create Config for each domain
 
 ### Automatic scraping
 Everytime user adds a new product in his list of products, the scrape method is run in the background to collect all the data about that link. If currenty there is no configuraiton for that website an email will be send to the administrator to create configuration for that website.
-Also, here we use the Time triggered function, witch occurs on constant intervals and checks for each user if scraping should be performed based on his scheddule perferences, should it be every day, every month or other. If so, then for each of his products we run the `Scrape` method to check if there is any change in the product details from previous time.
-You can see the flow in this chart:  
-###IMAGE HERE###
+Also, here we use the Time triggered function, witch occurs on constant intervals and checks for each user if scraping should be performed based on his scheddule perferences, should it be every day, every month or other. If so, then for each of his products we run the `Scrape` method to check if there is any change in the product details from previous time.  
+You can see the flow in this chart:    
+![Function app](Diagrams/AutomaticScraping.png)
+*<center>Automatic scraping using Time triggered function</center>*  
 
 ### Manual scraping
 User can also manualy check for product changes when he opens the webpage, and in the list of the product, there is a `Check` button, witch invokes the Scrape function.  
 ###IMAGE HERE###
+![Function app](Images/manualCheckButton.png)
+*<center>Manual scraping</center>*  
 
 
 # ProductScraper.Functions.Tests
