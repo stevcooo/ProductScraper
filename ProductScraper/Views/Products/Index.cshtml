@@ -18,13 +18,16 @@
             <th>
                 Price
             </th>
+            <th style="width: 15%">
+                Previous price
+            </th>
             <th>
                 Currency
             </th>
             <th>
                 Available
             </th>
-            <th>
+            <th style="width: 20%">
                 Last checked
             </th>
             <th>
@@ -44,6 +47,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PreviousPrice)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Currency)
@@ -77,7 +83,6 @@
             <td>
                 <a asp-action="Check" asp-route-id="@item.Id">Check</a> |
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Info</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>

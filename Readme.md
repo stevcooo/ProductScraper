@@ -269,7 +269,7 @@ This is the project where Azure functions are developed. I've developed three ty
 - [`CheckForUsersReadyForEmailNotification.cs`](ProductScraper.Functions/EmailNotificationsFunctions/CheckForUsersReadyForEmailNotification.cs)
 
 ## Scraping
-Initial idea of this project was web scraping. Whole scraping logic in located in this project in `Scrape` method in `Utils` class. 
+Initial idea of this project was web scraping. Whole scraping logic in located in this project in `Scrape` method in [`Utils.cs`](ProductScraper.Functions/Common/Utils.cs) class. 
 I'm using [`HtmlAgilityPack`](https://html-agility-pack.net) here to do all the web scraping. It's a really nice package with tons of features and handles the web scraping very well in my experience. In order to scrape info from web site, we need to configure witch info is important for us, in this case Name, Price and Availability. 
 Because every website has it's own layout, we will create Config for each domain that we want to scrape info from. I've created a video where I show how to add configuration for a website.
 ###LINK TO VIDEO###
@@ -283,3 +283,18 @@ You can see the flow in this chart:
 ### Manual scraping
 User can also manualy check for product changes when he opens the webpage, and in the list of the product, there is a `Check` button, witch invokes the Scrape function.  
 ###IMAGE HERE###
+
+
+# ProductScraper.Functions.Tests
+This is obviusly project where I put all the tests. There are not many tests, i need to update it. Basicly what is use this project for now is for manual testing my methods and configrations. Using tests you can easily check if some part of your code behavies like it should or not. Here I created few ScrapConfig configurations and i can easily check if they work or not. If i set this project as a step of continuious integration i can be sure that every configuraiton works without any problems, that saves a lot of pain and time.
+
+# ProductScraper.Models
+Here i store all EntityModels, objects that should be saved into database, and all the ViewModels, objects that are used for data transfer between layers, but i's not stored anyware. One important thing amyt the entity models is that tye are all decendants of the `TableEntity` class, that is required in order to be able to be saved in AzureStorage tables.
+
+# ProductScraper.Services
+In this projects are all services that Web project is using to access the data. Every service has it's own `Interface` and `Implementation` they can be found in Interfaces and Implementations folders accordingly. As I mentioned above, here implemented two aproaces of the accessing azure storage data, one using `Functions` and the other one using direct access to Azure Table storages.  
+## Access data using Azure functions
+In [`ScrapeConfigService.cs`](ProductScraper.Services/Implementations/ScrapeConfigService.cs) you can see how i call Azure function in order to read/write data to Azure storage table.
+
+## Direct data access
+In [`ProductInfoService.cs`](ProductScraper.Services/Implementations/ProductInfoService.cs) you can see how i directly access Azure table using [`AzureTableStorage.cs`](ProductScraper.Services/Implementations/AzureTableStorage.cs) implementation of repository pattern. Here in this service i pass `AzureTableSettings` where all the table info is stored, in that way i can access Azure Storage Table.
