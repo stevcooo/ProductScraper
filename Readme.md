@@ -8,7 +8,7 @@ _TL;DR: I wanted to buy a mouse wich was on 50% sale twice a year. I was too laz
 - [Azure functions](#Azure-functions)
 - [Azure queues](#Azure-queues)
 - [Azure tables](#Azure-tables)
-  - [Accessing table data](##Accessing-table-data)
+  - [Accessing table data](#Accessing-table-data)
     - [Direct access](##Direct-access)
     - [Access using azure functions](##Access-using-azure-functions)
 - [Email sending](#Email-sending)
