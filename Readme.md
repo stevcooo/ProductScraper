@@ -3,6 +3,46 @@
 _TL;DR: I wanted to buy a mouse wich was on 50% sale twice a year. I was too lazy to check when it's on sale, so I created a website that will do that for me and send me an email when there is a change on the price/availability using Azure serverless architecture and .net core framework. If you follow along, I'll teach you how to do that yourself or you can use my [website](https://product-scrape.azurewebsites.net)._
 
 
+- [Serverless buzz word](#Serverless-buzz-word)
+- [Idea](#Idea)
+- [Azure functions](#Azure-functions)
+- [Azure queues](#Azure-queues)
+- [Azure tables](#Azure-tables)
+  - [Accessing table data](#Accessing-table-data)
+    - [Direct access](#Direct-access)
+    - [Access using azure functions](#Access-using-azure-functions)
+- [Email sending](#Email-sending)
+- [ASP.NET Identity Core](#ASP.NET-Identity-Core)
+- [Azure resources](#Azure-resources)
+    - [Azure function](#Azure-function)
+    - [Send grid](##Send-grid)
+    - [App service](##App-service)
+    - [Application Insights](##Application-Insights)
+    - [Resource group](##Resource-group)
+    - [Cost Management + Billing](##Cost-Management-+-Billing)
+- [Product scraper solution](#Product-scraper-solution)
+  - [ProductScraper web](##ProductScraper-web)
+    - [ProductInfo table config](###ProductInfo-table-config)
+    - [ScrapeConfig table config](###ScrapeConfig-table-config)
+    - [UserProfile table config](###UserProfile-table-config)
+  - [ProductScraper.Common](##ProductScraper.Common)
+  - [ProductScraper.Functions](##ProductScraper.Functions)
+    - [Http triggered functions](###Http-triggered-functions)
+    - [Queue triggered functions](###Queue-triggered-functions)
+    - [Timer triggered functions](###Timer-triggered-functions)
+    - [Scraping](###Scraping)
+      - [Automatic scraping](###Automatic-scraping)
+      - [Manual scraping](###Manual-scraping)
+  - [ProductScraper.Functions.Tests](##ProductScraper.Functions.Tests)
+  - [ProductScraper.Models](##ProductScraper.Models)
+  - [ProductScraper.Services](##ProductScraper.Services)
+    - [Access data using Azure functions](###Access-data-using-Azure-functions)
+    - [Direct data access](###Direct-data-access)
+- [Code and test Azure Functions locally](#Code-and-test-Azure-Functions-locally)
+- [Azure Storage Explorer](#Azure-Storage-Explorer)
+- [Running the solution](#Running-the-solution)
+- [Contact info](#Contact-info)
+
 # Serverless buzz word
 To be clear, serverless != no server, there is no such thing as web architecture where no server is involved. In my opinion serverless is a poorly chosen word for architecture that doesn't require a whole server to be dedicated to doing a job of serving a small amount of processing, retrieving or writing data. Instead, there is one `Mega-Giga-Tera` big server (usually some cloud provider such as Amazon, Azure, Google services or similar) that can be used as a place where we can deploy a very small/tiny methods (stub routines) that can deal with this tiny data processing requests.
 
@@ -143,7 +183,7 @@ You can see this configuration in [`Startup.cs`](ProductScraper/Startup.cs) file
 For more detailed info on how to set this configuration, you can check on the [official project site](https://dlmelendez.github.io/identityazuretable/#/).  
 
   Also in [`Startup.cs`](ProductScraper/Startup.cs) file in `ConfigureServices` method there is configuration about the Azure table that I'm using. Here I add settings for each Azure table such as ConnectionString and TableName.
-##### ProductInfo table config
+### ProductInfo table config
 ```C#
     services.AddScoped<IAzureTableStorage<ProductInfo>>(factory =>
         {
@@ -153,7 +193,7 @@ For more detailed info on how to set this configuration, you can check on the [o
                     tableName: TableName.ProductInfo));
         });
 ```
-##### ScrapeConfig table config
+### ScrapeConfig table config
 ```C#
     services.AddScoped<IAzureTableStorage<ScrapeConfig>>(factory =>
         {
@@ -163,7 +203,7 @@ For more detailed info on how to set this configuration, you can check on the [o
                     tableName: TableName.ScrapeConfig));
         });
 ```
-##### UserProfile table config
+### UserProfile table config
 ```C#
     services.AddScoped<IAzureTableStorage<UserProfile>>(factory =>
         {
@@ -206,7 +246,7 @@ Or if you want to use this inside a method, you can use `User.IsInRole(ProductSc
 
 Also, in this project I've created two controllers, [`ProductsController.cs`](ProductScraper/Controllers/ProductsController.cs) and [`ScrapeConfigsController.cs`](ProductScraper/Controllers/ScrapeConfigsController.cs), they using the Services created in `ProductScraper.Services` project are interacting with the data, reading and writing to Azure tables or calling Azure functions.
 
-# ProductScraper.Common
+## ProductScraper.Common
 This is a small `netstandard2.0` project. Here I'll store all the common things for all other projects. For example, to avoid using strings and magic numbers in the code, I place all of them here and then use them as a constant field. That way when I change the name of a function, or a queue, I don't need to check all code, I only change the name here in this project. When you're using functions and queues, it's easy to forget the change a queue name in all functions that are related to that queue, but this approach helps you to avoid that scenario. This is how I keep track of the table names:
 This is how I keep track of the table names:
 ```C#
@@ -238,7 +278,7 @@ And this is how I use them later:
     }
 ```
 
-# ProductScraper.Functions
+## ProductScraper.Functions
 This is the project where Azure functions are developed. I've developed three types of Azure functions, Htpp, Queue and Timer triggered.
 ### Http triggered functions:
 - [`ScrapeProduct.cs`](ProductScraper.Functions/ScrapeFunctions/ScrapeProduct.cs)
@@ -257,13 +297,13 @@ This is the project where Azure functions are developed. I've developed three ty
 ### Timer triggered functions:
 - [`CheckForUsersReadyForEmailNotification.cs`](ProductScraper.Functions/EmailNotificationsFunctions/CheckForUsersReadyForEmailNotification.cs)
 
-## Scraping
+### Scraping
 The initial idea of this project was web scraping. Whole scraping logic is located in this project in `Scrape` method in [`Utils.cs`](ProductScraper.Functions/Common/Utils.cs) class. 
 I'm using [`HtmlAgilityPack`](https://html-agility-pack.net) here to do all the web scraping. It's a really nice package with tons of features and handles the web scraping very well in my experience. In order to scrape info from the web site, we need to configure witch info is important for us, in this case, Name, Price and Availability. 
 Because every website has it's own layout, we will create Config for each domain that we want to scrape info from. I've created a video where I show how to add configuration for a website.  
 ###LINK TO VIDEO###
 
-### Automatic scraping
+#### Automatic scraping
 Every time user adds a new product in his list of products, the scraping method is run in the background to collect all the data about that link. If currently there is no configuration for that website an email will be sent to the administrator to create a configuration for that website.
 Also, here we use the Time triggered function, witch occurs on constant intervals and checks for each user if scraping should be performed based on his schedule preferences, should it be every day, every month or other. If so, then for each of his products we run the `Scrape` method to check if there is any change in the product details from the previous time.  
 You can see the flow in this chart:  
@@ -272,24 +312,24 @@ You can see the flow in this chart:
 ![Function app](Diagrams/AutomaticScraping.png)
 *<center>Automatic scraping using Time triggered function</center>*  
 
-### Manual scraping
+#### Manual scraping
 User can also manually check for product changes when he opens the webpage, and in the list of the product, there is a `Check` button, which invokes the Scrape function.  
 ![Function app](Images/manualCheckButton.png)
 *<center>Manual scraping</center>*  
 
 
-# ProductScraper.Functions.Tests
+## ProductScraper.Functions.Tests
 This is projected where I put all the tests. There are not many tests, I need to update it. Basically what is use this project, for now, is for manual testing my methods and configurations. Using tests you can easily check if some part of your code behaves like it should or not. Here I created a few ScrapConfig configurations and I can easily check if they work or not. If I set this project as a step of continuous integration I can be sure that every configuration works without any problems, that saves a lot of pain and time.
 
-# ProductScraper.Models
+## ProductScraper.Models
 Here I store all EntityModels, objects that should be saved into the database, and all the ViewModels, objects that are used for data transfer between layers, but it's not stored anywhere. One important thing about the entity models is that they are all descendants of the `TableEntity` class, that is required to be able to be saved in AzureStorage tables.
 
-# ProductScraper.Services
+## ProductScraper.Services
 In these projects are all services that Web project is using to access the data. Every service has it's own `Interface` and `Implementation` they can be found in Interfaces and Implementations folders accordingly. As I mentioned above, here implemented two approaches of the accessing azure storage data, one using `Functions` and the other one using direct access to Azure Table storages.  
-## Access data using Azure functions
+### Access data using Azure functions
 In [`ScrapeConfigService.cs`](ProductScraper.Services/Implementations/ScrapeConfigService.cs) you can see how i call Azure function in order to read/write data to Azure storage table.
 
-## Direct data access
+### Direct data access
 In [`ProductInfoService.cs`](ProductScraper.Services/Implementations/ProductInfoService.cs) you can see how i directly access Azure table using [`AzureTableStorage.cs`](ProductScraper.Services/Implementations/AzureTableStorage.cs) implementation of repository pattern. Here in this service i pass `AzureTableSettings` where all the table info is stored, in that way i can access Azure Storage Table.
 
 
