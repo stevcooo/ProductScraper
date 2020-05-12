@@ -3,29 +3,29 @@
 _TL;DR: I wanted to buy a mouse wich was on 50% sale twice a year. I was too lazy to check when it's on sale, so I created a website that will do that for me and send me an email when there is a change on the price/availability using Azure serverless architecture and .net core framework. If you follow along, I'll teach you how to do that yourself or you can use my [website](https://product-scrape.azurewebsites.net)._
 
 
-- [Serverless buzz word](#Serverless-buzz-word)
-- [Idea](#Idea)
-- [Azure functions](#Azure-functions)
-- [Azure queues](#Azure-queues)
-- [Azure tables](#Azure-tables)
-  - [Accessing table data](#Accessing-table-data)
-    - [Direct access](#Direct-access)
-    - [Access using azure functions](#Access-using-azure-functions)
-- [Email sending](#Email-sending)
-- [ASP.NET Identity Core](#ASPIdentityCore)
-- [Azure resources](#Azure-resources)
-    - [Azure function](#Azure-function)
-    - [Send grid](#Send-grid)
-    - [App service](#App-service)
-    - [Application Insights](#Application-Insights)
-    - [Resource group](#Resource-group)
-    - [Cost Management + Billing](#CostManagementBilling)
-- [Product scraper solution](#Product-scraper-solution)
-  - [ProductScraper web](#ProductScraper-web)
-    - [ProductInfo table config](#ProductInfo-table-config)
-    - [ScrapeConfig table config](#ScrapeConfig-table-config)
-    - [UserProfile table config](#UserProfile-table-config)
-  - [ProductScraper.Common](#ProductScraperCommon)
+- [Serverless buzz word](#serverless-buzz-word)
+- [Idea](#idea)
+- [Azure functions](#azure-functions)
+- [Azure queues](#azure-queues)
+- [Azure tables](#azure-tables)
+  - [Accessing table data](#accessing-table-data)
+    - [Direct access](#direct-access)
+    - [Access using azure functions](#access-using-azure-functions)
+- [Email sending](#email-sending)
+- [ASP.NET Identity Core](#aspnet-identity-core)
+- [Azure resources](#azure-resources)
+    - [Azure function](#azure-function)
+    - [Send grid](#send-grid)
+    - [App service](#app-service)
+    - [Application Insights](#application-Insights)
+    - [Resource group](#resource-group)
+    - [Cost Management and Billing](#cost-management-and-billing)
+- [Product scraper solution](#product-scraper-solution)
+  - [ProductScraper web](#productScraper-web)
+    - [ProductInfo table config](#productInfo-table-config)
+    - [ScrapeConfig table config](#scrapeConfig-table-config)
+    - [UserProfile table config](#userProfile-table-config)
+  - [ProductScraper.Common](#productscrapercommon)
   - [ProductScraper.Functions](#ProductScraperFunctions)
     - [Http triggered functions](#Http-triggered-functions)
     - [Queue triggered functions](#Queue-triggered-functions)
@@ -88,7 +88,7 @@ In my demo, I've created a service that I will use to send emails whenever my ap
 ![Direct data access](Diagrams/EmailDiagram.png)
 *<center>Email sending flow</center>*
 
-# ASP.NET Identity Core {#ASPIdentityCore}
+# ASP.NET Identity Core
 Whenever users are involved in a web application, there is always a need to be able to authenticate or authorize them. Usually, when we use .net core as a technology we tend to use Identity service. One thing that is bonded to the Identity service is that it requires MSSQL data provider, but that is now what is suitable for me in this demo since I choose to use Azure tables as storage, of course, we can make a hybrid app where identity will be stored in MSSQL and all other data in Azure tables, but I found a NuGet package that will implement all the Identity functionality but it will rely on Azure Tables, that's great. This is the package [Identityazuretable](https://dlmelendez.github.io/identityazuretable/#/) that I'll be using in this project for the identity part.
 ![Identity](Diagrams/IdentityDiagram.png)
 *<center>Identityazuretable architecture</center>*
@@ -130,7 +130,7 @@ An Azure resource group is like a namespace or folder or a group for Azure servi
 *<center>Services in the resource group that I used for this demo</center>*  
 
 
-## Cost Management + Billing {#CostManagementBilling}
+## Cost Management and Billing
 The very important thing is when using online service where you have a play Pay-as-you-go, 
 like in this case, to check your bill every few days to avoid big or unexpected costs. 
 I've done this mistake once, I've ended up with a huge bill because I selected some pricing plan that I wasn't aware how much it will cost 
@@ -246,7 +246,7 @@ Or if you want to use this inside a method, you can use `User.IsInRole(ProductSc
 
 Also, in this project I've created two controllers, [`ProductsController.cs`](ProductScraper/Controllers/ProductsController.cs) and [`ScrapeConfigsController.cs`](ProductScraper/Controllers/ScrapeConfigsController.cs), they using the Services created in `ProductScraper.Services` project are interacting with the data, reading and writing to Azure tables or calling Azure functions.
 
-## ProductScraper.Common {#ProductScraperCommon}
+## ProductScraper.Common
 This is a small `netstandard2.0` project. Here I'll store all the common things for all other projects. For example, to avoid using strings and magic numbers in the code, I place all of them here and then use them as a constant field. That way when I change the name of a function, or a queue, I don't need to check all code, I only change the name here in this project. When you're using functions and queues, it's easy to forget the change a queue name in all functions that are related to that queue, but this approach helps you to avoid that scenario. This is how I keep track of the table names:
 This is how I keep track of the table names:
 ```C#
@@ -278,7 +278,7 @@ And this is how I use them later:
     }
 ```
 
-## ProductScraper.Functions {#ProductScraperFunctions}
+## ProductScraper.Functions
 This is the project where Azure functions are developed. I've developed three types of Azure functions, Htpp, Queue and Timer triggered.
 ### Http triggered functions:
 - [`ScrapeProduct.cs`](ProductScraper.Functions/ScrapeFunctions/ScrapeProduct.cs)
@@ -322,13 +322,13 @@ User can also manually check for product changes when he opens the webpage, and 
 *<center>Manual scraping</center>*  
 
 
-## ProductScraper.Functions.Tests {#ProductScraperFunctionsTests}
+## ProductScraper.Functions.Tests
 This is projected where I put all the tests. There are not many tests, I need to update it. Basically what is use this project, for now, is for manual testing my methods and configurations. Using tests you can easily check if some part of your code behaves like it should or not. Here I created a few ScrapConfig configurations and I can easily check if they work or not. If I set this project as a step of continuous integration I can be sure that every configuration works without any problems, that saves a lot of pain and time.
 
-## ProductScraper.Models {#ProductScraperModels}
+## ProductScraper.Models
 Here I store all EntityModels, objects that should be saved into the database, and all the ViewModels, objects that are used for data transfer between layers, but it's not stored anywhere. One important thing about the entity models is that they are all descendants of the `TableEntity` class, that is required to be able to be saved in AzureStorage tables.
 
-## ProductScraper.Services {#ProductScraperServices}
+## ProductScraper.Services
 In these projects are all services that Web project is using to access the data. Every service has it's own `Interface` and `Implementation` they can be found in Interfaces and Implementations folders accordingly. As I mentioned above, here implemented two approaches of the accessing azure storage data, one using `Functions` and the other one using direct access to Azure Table storages.  
 ### Access data using Azure functions
 In [`ScrapeConfigService.cs`](ProductScraper.Services/Implementations/ScrapeConfigService.cs) you can see how i call Azure function in order to read/write data to Azure storage table.
