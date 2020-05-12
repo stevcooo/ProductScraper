@@ -12,30 +12,30 @@ _TL;DR: I wanted to buy a mouse wich was on 50% sale twice a year. I was too laz
     - [Direct access](#Direct-access)
     - [Access using azure functions](#Access-using-azure-functions)
 - [Email sending](#Email-sending)
-- [ASP.NET Identity Core](#ASP.NET-Identity-Core)
+- [ASP.NET Identity Core](#ASPIdentityCore)
 - [Azure resources](#Azure-resources)
     - [Azure function](#Azure-function)
     - [Send grid](#Send-grid)
     - [App service](#App-service)
     - [Application Insights](#Application-Insights)
     - [Resource group](#Resource-group)
-    - [Cost Management + Billing](#Cost-Management-+-Billing)
+    - [Cost Management + Billing](#CostManagementBilling)
 - [Product scraper solution](#Product-scraper-solution)
   - [ProductScraper web](#ProductScraper-web)
     - [ProductInfo table config](#ProductInfo-table-config)
     - [ScrapeConfig table config](#ScrapeConfig-table-config)
     - [UserProfile table config](#UserProfile-table-config)
-  - [ProductScraper.Common](#ProductScraper.Common)
-  - [ProductScraper.Functions](#ProductScraper.Functions)
+  - [ProductScraper.Common](#ProductScraperCommon)
+  - [ProductScraper.Functions](#ProductScraperFunctions)
     - [Http triggered functions](#Http-triggered-functions)
     - [Queue triggered functions](#Queue-triggered-functions)
     - [Timer triggered functions](#Timer-triggered-functions)
     - [Scraping](#Scraping)
       - [Automatic scraping](#Automatic-scraping)
       - [Manual scraping](#Manual-scraping)
-  - [ProductScraper.Functions.Tests](#ProductScraper.Functions.Tests)
-  - [ProductScraper.Models](#ProductScraper.Models)
-  - [ProductScraper.Services](#ProductScraper.Services)
+  - [ProductScraper.Functions.Tests](#ProductScraperFunctionsTests)
+  - [ProductScraper.Models](#ProductScraperModels)
+  - [ProductScraper.Services](#ProductScraperServices)
     - [Access data using Azure functions](#Access-data-using-Azure-functions)
     - [Direct data access](#Direct-data-access)
 - [Code and test Azure Functions locally](#Code-and-test-Azure-Functions-locally)
@@ -88,7 +88,7 @@ In my demo, I've created a service that I will use to send emails whenever my ap
 ![Direct data access](Diagrams/EmailDiagram.png)
 *<center>Email sending flow</center>*
 
-# ASP.NET Identity Core
+# ASP.NET Identity Core {#ASPIdentityCore}
 Whenever users are involved in a web application, there is always a need to be able to authenticate or authorize them. Usually, when we use .net core as a technology we tend to use Identity service. One thing that is bonded to the Identity service is that it requires MSSQL data provider, but that is now what is suitable for me in this demo since I choose to use Azure tables as storage, of course, we can make a hybrid app where identity will be stored in MSSQL and all other data in Azure tables, but I found a NuGet package that will implement all the Identity functionality but it will rely on Azure Tables, that's great. This is the package [Identityazuretable](https://dlmelendez.github.io/identityazuretable/#/) that I'll be using in this project for the identity part.
 ![Identity](Diagrams/IdentityDiagram.png)
 *<center>Identityazuretable architecture</center>*
@@ -130,7 +130,7 @@ An Azure resource group is like a namespace or folder or a group for Azure servi
 *<center>Services in the resource group that I used for this demo</center>*  
 
 
-## Cost Management + Billing
+## Cost Management + Billing {#CostManagementBilling}
 The very important thing is when using online service where you have a play Pay-as-you-go, 
 like in this case, to check your bill every few days to avoid big or unexpected costs. 
 I've done this mistake once, I've ended up with a huge bill because I selected some pricing plan that I wasn't aware how much it will cost 
@@ -246,7 +246,7 @@ Or if you want to use this inside a method, you can use `User.IsInRole(ProductSc
 
 Also, in this project I've created two controllers, [`ProductsController.cs`](ProductScraper/Controllers/ProductsController.cs) and [`ScrapeConfigsController.cs`](ProductScraper/Controllers/ScrapeConfigsController.cs), they using the Services created in `ProductScraper.Services` project are interacting with the data, reading and writing to Azure tables or calling Azure functions.
 
-## ProductScraper.Common
+## ProductScraper.Common {#ProductScraperCommon}
 This is a small `netstandard2.0` project. Here I'll store all the common things for all other projects. For example, to avoid using strings and magic numbers in the code, I place all of them here and then use them as a constant field. That way when I change the name of a function, or a queue, I don't need to check all code, I only change the name here in this project. When you're using functions and queues, it's easy to forget the change a queue name in all functions that are related to that queue, but this approach helps you to avoid that scenario. This is how I keep track of the table names:
 This is how I keep track of the table names:
 ```C#
@@ -278,7 +278,7 @@ And this is how I use them later:
     }
 ```
 
-## ProductScraper.Functions
+## ProductScraper.Functions {#ProductScraperFunctions}
 This is the project where Azure functions are developed. I've developed three types of Azure functions, Htpp, Queue and Timer triggered.
 ### Http triggered functions:
 - [`ScrapeProduct.cs`](ProductScraper.Functions/ScrapeFunctions/ScrapeProduct.cs)
@@ -301,13 +301,17 @@ This is the project where Azure functions are developed. I've developed three ty
 The initial idea of this project was web scraping. Whole scraping logic is located in this project in `Scrape` method in [`Utils.cs`](ProductScraper.Functions/Common/Utils.cs) class. 
 I'm using [`HtmlAgilityPack`](https://html-agility-pack.net) here to do all the web scraping. It's a really nice package with tons of features and handles the web scraping very well in my experience. In order to scrape info from the web site, we need to configure witch info is important for us, in this case, Name, Price and Availability. 
 Because every website has it's own layout, we will create Config for each domain that we want to scrape info from. I've created a video where I show how to add configuration for a website.  
-###LINK TO VIDEO###
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/rCfHlkDJ_G8/0.jpg)](https://www.youtube.com/watch?v=rCfHlkDJ_G8)
+*<center>Add scrape configuration</center>*  
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/7v3LVJwylCk/0.jpg)](https://www.youtube.com/watch?v=7v3LVJwylCk)
+*<center>Add product to your list</center>*  
 
 #### Automatic scraping
 Every time user adds a new product in his list of products, the scraping method is run in the background to collect all the data about that link. If currently there is no configuration for that website an email will be sent to the administrator to create a configuration for that website.
 Also, here we use the Time triggered function, witch occurs on constant intervals and checks for each user if scraping should be performed based on his schedule preferences, should it be every day, every month or other. If so, then for each of his products we run the `Scrape` method to check if there is any change in the product details from the previous time.  
 You can see the flow in this chart:  
-
 
 ![Function app](Diagrams/AutomaticScraping.png)
 *<center>Automatic scraping using Time triggered function</center>*  
@@ -318,13 +322,13 @@ User can also manually check for product changes when he opens the webpage, and 
 *<center>Manual scraping</center>*  
 
 
-## ProductScraper.Functions.Tests
+## ProductScraper.Functions.Tests {#ProductScraperFunctionsTests}
 This is projected where I put all the tests. There are not many tests, I need to update it. Basically what is use this project, for now, is for manual testing my methods and configurations. Using tests you can easily check if some part of your code behaves like it should or not. Here I created a few ScrapConfig configurations and I can easily check if they work or not. If I set this project as a step of continuous integration I can be sure that every configuration works without any problems, that saves a lot of pain and time.
 
-## ProductScraper.Models
+## ProductScraper.Models {#ProductScraperModels}
 Here I store all EntityModels, objects that should be saved into the database, and all the ViewModels, objects that are used for data transfer between layers, but it's not stored anywhere. One important thing about the entity models is that they are all descendants of the `TableEntity` class, that is required to be able to be saved in AzureStorage tables.
 
-## ProductScraper.Services
+## ProductScraper.Services {#ProductScraperServices}
 In these projects are all services that Web project is using to access the data. Every service has it's own `Interface` and `Implementation` they can be found in Interfaces and Implementations folders accordingly. As I mentioned above, here implemented two approaches of the accessing azure storage data, one using `Functions` and the other one using direct access to Azure Table storages.  
 ### Access data using Azure functions
 In [`ScrapeConfigService.cs`](ProductScraper.Services/Implementations/ScrapeConfigService.cs) you can see how i call Azure function in order to read/write data to Azure storage table.
