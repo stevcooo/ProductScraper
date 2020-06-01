@@ -72,15 +72,26 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 emailBodyBuilder.AppendLine();
                 emailBodyBuilder.AppendLine("<br>");
                 emailBodyBuilder.AppendLine("<br>");
-                emailBodyBuilder.AppendLine("<a href='https://product-scrape.azurewebsites.net/Products'>Here you can see the list of your products</a>");            
-                emailMessage = new EmailMessage(userProfile.UserId, "Products updates", emailBodyBuilder.ToString());
+                emailBodyBuilder.AppendLine("<a href='https://product-scrape.azurewebsites.net/Products'>Here you can see the list of your products</a>");
+                emailMessage = new EmailMessage
+                {
+                    UserId = userProfile.UserId,
+                    Subject = "Products updates",
+                    Content = emailBodyBuilder.ToString()
+                };
+
                 log.LogInformation($"EmailMessage Product updates");
                 await emailMessageQueue.AddAsync(emailMessage);
             }
             else if (userProfile.SendEmailWhenNoProductHasBeenChanged)
             {
                 log.LogInformation($"EmailMessage No Product update");
-                emailMessage = new EmailMessage(userProfile.UserId, "Products updates", "None of your products has been updated/changed since last check.");
+                emailMessage = new EmailMessage
+                {
+                    UserId = userProfile.UserId,
+                    Subject = "Products updates",
+                    Content = "None of your products has been updated/changed since last check."
+                };
                 await emailMessageQueue.AddAsync(emailMessage);
             }
         }

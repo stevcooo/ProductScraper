@@ -46,7 +46,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
                     message.SetFrom(new EmailAddress("info@productscrape.com", "Product scraper"));
                     message.AddTo(CommonName.AdminEmail);
                     message.SetSubject("Missing configuration");
-                    message.AddContent("text/plain", $"There was request for scraping products from {product.URL.ToCoreUrl()}, consider adding configuration soon.");
+                    message.AddContent("text/plain", $"There was request for scraping products from {product.URL.ToCoreUrl()}, consider adding configuration soon. Product Url {product.URL}");
                     await emailMessageQueue.AddAsync(message);
                 }
                 else if (configs.Count() > 1)

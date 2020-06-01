@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
 using ProductScraper.Common.Naming;
@@ -7,11 +9,11 @@ using System;
 
 namespace ProductScraper.Functions.EmailNotificationsFunctions
 {
-    public static class CheckForUsersReadyForEmailNotification
+    public static class CheckForUsersReadyForEmailNotificationHttpTest
     {
-        [FunctionName(FunctionName.CheckForUsersReadyForEmailNotification)]
+        [FunctionName("CheckForUsersReadyForEmailNotificationHttpTest")]
         //"0 0 */2 * * *"	once every two hours
-        public static async void Run([TimerTrigger("0 0 11 * * *")]TimerInfo timerInfo,
+        public static async void Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req,
             [Table(TableName.UserProfile)] CloudTable userProfileTable,
             [Queue(QueueName.UsersReadyForNotifications)] IAsyncCollector<UserProfile> usersReadyForNotificationsQueue,
             ILogger log)
