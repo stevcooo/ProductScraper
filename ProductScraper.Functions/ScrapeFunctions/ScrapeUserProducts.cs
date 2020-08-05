@@ -6,6 +6,8 @@ using ProductScraper.Functions.Common;
 using ProductScraper.Models.EntityModels;
 using ProductScraper.Models.Extensions;
 using ProductScraper.Models.ViewModels;
+using SendGrid.Helpers.Mail;
+using System;
 using System.Linq;
 using System.Text;
 
@@ -17,6 +19,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
         public static async void Run(
             [QueueTrigger(QueueName.UsersReadyForNotifications, Connection = CommonName.Connection)]UserProfile userProfile,
             [Queue(QueueName.ProductUpdateEmailNotifications)] IAsyncCollector<EmailMessage> emailMessageQueue,
+            [Queue(QueueName.EmailsToSend)] IAsyncCollector<SendGridMessage> sendGridMessageQueue,
             IBinder binder,
             ILogger log)
         {
@@ -50,7 +53,30 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 if (config != null)
                 {
                     log.LogInformation($"ScrapeConfig : {config.Name}");
-                    await Utils.Scrape(config, product, log);                    
+                    try
+                    {
+                        await Utils.Scrape(config, product, log);
+                    }
+                    catch(Exception ex)
+                    {
+                        string errorMsg = ex.Message;
+                        
+                        while (ex.InnerException != null)
+                        {
+                            errorMsg += Environment.NewLine + ex.InnerException.Message;
+                            ex = ex.InnerException;
+                        }
+
+                        var error = $"Error while trying to scrape product = {product.Name}, URL={product.URL}. Error: {ex.Message}";
+                        log.LogError(error);
+                        SendGridMessage message = new SendGridMessage();
+                        message.AddTo("stevcooo@gmail.com");
+                        message.AddContent("text/html", error);
+                        message.SetFrom(new EmailAddress("stevan@kostoski.com"));
+                        message.SetSubject("Product scrape exception");
+                        await sendGridMessageQueue.AddAsync(message);
+                    }
+
                     if (product.HasChangesSinceLastTime)
                     {
                         var productUpdateLine = Utils.CreateProductEmailLine(product);
