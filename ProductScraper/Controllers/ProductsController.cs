@@ -4,6 +4,7 @@ using ProductScraper.Models.EntityModels;
 using ProductScraper.Services.Exceptions;
 using ProductScraper.Services.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -13,10 +14,12 @@ namespace ProductScraper.Controllers
     public class ProductsController : Controller
     {
         private readonly IProductInfoService _productInfoService;
+        private readonly IProductInfoHistoryService _productInfoHistoryService;
 
-        public ProductsController(IProductInfoService productInfoService)
+        public ProductsController(IProductInfoService productInfoService, IProductInfoHistoryService productInfoHistoryService)
         {
             _productInfoService = productInfoService;
+            _productInfoHistoryService = productInfoHistoryService;
         }
 
         // GET: Products
@@ -24,6 +27,12 @@ namespace ProductScraper.Controllers
         {
             string _userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return View(await _productInfoService.GetAllAsync(_userId));
+        }
+
+        // GET: Products
+        public async Task<IActionResult> History(long id)
+        {
+            return PartialView(await _productInfoHistoryService.GetAllForProductAsync(id));
         }
 
         // GET: Products/Details/5

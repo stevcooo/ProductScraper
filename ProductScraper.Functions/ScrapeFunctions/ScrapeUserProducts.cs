@@ -18,6 +18,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
         [FunctionName(FunctionName.ScrapeUserProducts)]
         public static async void Run(
             [QueueTrigger(QueueName.UsersReadyForNotifications, Connection = CommonName.Connection)]UserProfile userProfile,
+            [Queue(QueueName.AddProductHistory)] IAsyncCollector<ProductInfo> addProductHistoryMessageQueue,
             [Queue(QueueName.ProductUpdateEmailNotifications)] IAsyncCollector<EmailMessage> emailMessageQueue,
             [Queue(QueueName.EmailsToSend)] IAsyncCollector<SendGridMessage> sendGridMessageQueue,
             IBinder binder,
@@ -82,6 +83,9 @@ namespace ProductScraper.Functions.ScrapeFunctions
                         var productUpdateLine = Utils.CreateProductEmailLine(product);
                         emailBodyBuilder.AppendLine(productUpdateLine);
                         emailBodyBuilder.AppendLine("<br>");
+
+                        //Add to history queue
+                        await addProductHistoryMessageQueue.AddAsync(product);
                     }
 
                     //Update product in db

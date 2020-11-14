@@ -41,6 +41,11 @@ namespace ProductScraper.Services.Implementations
             return results;
         }
 
+        public async Task<List<T>> GetList(long partitionKey)
+        {
+            return await GetList(partitionKey.ToString());
+        }
+
         public async Task<List<T>> GetList(string partitionKey)
         {
             //Table
@@ -65,6 +70,10 @@ namespace ProductScraper.Services.Implementations
             } while (continuationToken != null);
 
             return results;
+        }
+        public async Task<T> GetItem(long partitionKey, long rowKey)
+        {
+            return await GetItem(partitionKey.ToString(), rowKey.ToString());
         }
 
         public async Task<T> GetItem(string partitionKey, string rowKey)

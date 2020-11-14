@@ -4,6 +4,7 @@
     {
         public const string UsersReadyForNotifications = "UsersReadyForNotifications";
         public const string ProductUpdateEmailNotifications = "ProductUpdateEmailNotifications";
+        public const string AddProductHistory = "AddProductHistory";
         public const string EmailsToSend = "EmailsToSend";
         public const string ChnagedProducts = "ChnagedProducts";
     }

@@ -21,6 +21,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = FunctionName.ScrapeProduct + "/{userId}/{productId}")] HttpRequest req,
             [Table(TableName.ProductInfo, "{userId}")] CloudTable productInfoTable,
             [Table(TableName.ScrapeConfig)] CloudTable scrapeConfigTable,
+            [Queue(QueueName.AddProductHistory)] IAsyncCollector<ProductInfo> addProductHistoryMessageQueue,
             [Queue(QueueName.EmailsToSend)] IAsyncCollector<SendGridMessage> emailMessageQueue,
             string userId,
             string productId,
@@ -65,6 +66,9 @@ namespace ProductScraper.Functions.ScrapeFunctions
                     //Update product in db
                     TableOperation operation = TableOperation.InsertOrReplace(product);
                     await productInfoTable.ExecuteAsync(operation);
+
+                    //Add to history queue
+                    await addProductHistoryMessageQueue.AddAsync(product);
                 }
             }
             else

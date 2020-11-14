@@ -3,6 +3,7 @@
     public static class TableName
     {
         public const string ProductInfo = "ProductInfo";
+        public const string ProductInfoHistory = "ProductInfoHistory";
         public const string ScrapeConfig = "ScrapeConfig";
         public const string UserProfile = "UserProfile";
 

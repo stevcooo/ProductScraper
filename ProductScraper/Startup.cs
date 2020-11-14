@@ -87,6 +87,16 @@ namespace ProductScraper
 
             services.AddScoped<IProductInfoService, ProductInfoService>();
 
+            services.AddScoped<IAzureTableStorage<ProductInfoHistory>>(factory =>
+            {
+                return new AzureTableStorage<ProductInfoHistory>(
+                    new AzureTableSettings(
+                        storageConnectionString: Configuration.GetSection("AzureTable:StorageConnectionString").Value,
+                        tableName: TableName.ProductInfoHistory));
+            });
+
+            services.AddScoped<IProductInfoHistoryService, ProductInfoHistoryService>();
+
             services.AddScoped<IAzureTableStorage<ScrapeConfig>>(factory =>
             {
                 return new AzureTableStorage<ScrapeConfig>(

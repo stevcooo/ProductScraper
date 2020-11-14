@@ -1,0 +1,34 @@
+﻿@model IEnumerable<ProductScraper.Models.EntityModels.ProductInfoHistory>
+
+@if (!Model.Any())
+{
+    <h2>There is no price history for this product</h2>
+}
+else
+{
+<table class="table">
+    <thead>
+        <tr>
+            <th style="border-top:unset;">
+                Price
+            </th>
+            <th style="border-top:unset;">
+                Date
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+}

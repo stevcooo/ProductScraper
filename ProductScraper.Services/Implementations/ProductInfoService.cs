@@ -35,7 +35,7 @@ namespace ProductScraper.Services.Implementations
         {
             CancellationToken cancellationToken;
 
-            string url = _settings.Value.AzureFunctionURL + FunctionName.ScrapeProduct + $"/{userId}/{id}/" + _settings.Value.AzureFunctionCode;
+            string url = _settings.Value.AzureFunctionURL + FunctionName.ScrapeProduct + $"/{userId}/{id}/?code=" + _settings.Value.AzureFunctionCode;
             using HttpClient client = new HttpClient();
             using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
             using HttpResponseMessage response = await client

@@ -46,7 +46,7 @@
 
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Price)
+                @Html.DisplayFor(modelItem => item.Price) <a onclick="checkProductHistory('@item.Id')" href="#">History</a>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PreviousPrice)
@@ -89,3 +89,36 @@
 }
     </tbody>
 </table>
+<div id="productHistoryModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">History</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="productHistoryModalBody">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function checkProductHistory(id) {
+        console.log(id);
+        $.ajax({
+            async: true,
+            type: "GET",
+            url: '/Products/History/' + id,
+            success: function (data) {
+                $('#productHistoryModalBody').html(data);
+                $('#productHistoryModal').modal('show');
+                console.log(data);
+            }
+        });
+    }
+</script>
