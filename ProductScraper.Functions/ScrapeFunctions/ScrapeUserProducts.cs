@@ -54,9 +54,10 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 if (config != null)
                 {
                     log.LogInformation($"ScrapeConfig : {config.Name}");
+                    Utils utils = new Utils();
                     try
                     {
-                        await Utils.Scrape(config, product, log);
+                        await utils.Scrape(config, product, log);
                     }
                     catch(Exception ex)
                     {
@@ -80,7 +81,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
 
                     if (product.HasChangesSinceLastTime)
                     {
-                        var productUpdateLine = Utils.CreateProductEmailLine(product);
+                        var productUpdateLine = utils.CreateProductEmailLine(product);
                         emailBodyBuilder.AppendLine(productUpdateLine);
                         emailBodyBuilder.AppendLine("<br>");
 

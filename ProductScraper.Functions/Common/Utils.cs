@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace ProductScraper.Functions.Common
 {
-    public static class Utils
+    public class Utils
     {
-        private static readonly WebClient _webClient = new WebClient();
+        private readonly WebClient _webClient = new WebClient();
 
-        public static async Task Scrape(ScrapeConfig scrapeConfig, ProductInfo product, ILogger log)
+        public async Task Scrape(ScrapeConfig scrapeConfig, ProductInfo product, ILogger log)
         {
             if (string.IsNullOrWhiteSpace(product.URL))
             {
@@ -109,7 +109,7 @@ namespace ProductScraper.Functions.Common
             product.LastCheckedOn = DateTime.UtcNow;
         }
 
-        public static string CreateProductEmailLine(ProductInfo product)
+        public string CreateProductEmailLine(ProductInfo product)
         {
             var emailBodyBuilder = new StringBuilder();
             emailBodyBuilder.Append($"<a href='{product.URL}' target='_blank'>{product.Name}</a> Price: {product.Price} {product.Currency} ");

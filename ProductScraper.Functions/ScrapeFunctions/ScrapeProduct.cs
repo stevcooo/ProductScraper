@@ -62,7 +62,8 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 }
                 else if (configs.Count() == 1)
                 {
-                    await Utils.Scrape(configs.First(), product, log);
+                    Utils utils = new Utils();
+                    await utils.Scrape(configs.First(), product, log);
                     //Update product in db
                     TableOperation operation = TableOperation.InsertOrReplace(product);
                     await productInfoTable.ExecuteAsync(operation);
