@@ -4,21 +4,21 @@ using ProductScraper.Common.Naming;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using System.Text;
 using Microsoft.WindowsAzure.Storage.Table;
 using ProductScraper.Models.EntityModels;
 using ScrapySharp.Extensions;
 using ScrapySharp.Network;
+using SendGrid.Helpers.Mail;
 
 namespace ProductScraper.Functions.EmailNotificationsFunctions
 {
     public static class ScrapeCars
     {
         [FunctionName(FunctionName.ScrapeCars)]
-        public static async void Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = FunctionName.ScrapeCars)] HttpRequest req,
+        public static async void Run([TimerTrigger("0 */2 * * * ")]TimerInfo timerInfo,
             [Table(TableName.Ads)] CloudTable adsTable,
+            [Queue(QueueName.EmailsToSend)] IAsyncCollector<SendGridMessage> emailMessageQueue,
             ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
@@ -49,8 +49,15 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
             if (adsFromWeb.Any())
             {
                 // Save new to db
+                var emailBodyBuilder = new StringBuilder();
+                emailBodyBuilder.AppendLine("These are the new ads from Toyota:");
+                emailBodyBuilder.AppendLine("<br>");
+                emailBodyBuilder.AppendLine("<br>");
+                
                 foreach (var ad in adsFromWeb)
                 {
+                    emailBodyBuilder.AppendLine($"<a href='https://www.pazar3.mk/${ad.Key}'>{ad.Value}</a>");
+                    emailBodyBuilder.AppendLine("<br>");
                     var newAd = new Ad
                     {
                         Id = DateTime.Now.Ticks,
@@ -62,7 +69,12 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
                     await adsTable.ExecuteAsync(TableOperation.Insert(newAd));
                 }
                 // send email with new links
-                log.LogInformation("Email will be send with : {Count}", adsFromWeb.Count);
+                var message = new SendGridMessage();
+                message.AddTo("stevcooo@gmail.com");
+                message.AddContent("text/html", emailBodyBuilder.ToString());
+                message.SetFrom(new EmailAddress("stevan@kostoski.com"));
+                message.SetSubject("Toyota ads");
+                await emailMessageQueue.AddAsync(message);
             } else 
                 log.LogInformation("There are no new ads!");
             
