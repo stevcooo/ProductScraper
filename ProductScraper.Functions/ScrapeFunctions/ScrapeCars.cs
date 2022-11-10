@@ -16,7 +16,7 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
     public static class ScrapeCars
     {
         [FunctionName(FunctionName.ScrapeCars)]
-        public static async void Run([TimerTrigger("0 */2 * * * ")]TimerInfo timerInfo,
+        public static async void Run([TimerTrigger("0 0 8-18 * * *")]TimerInfo timerInfo,
             [Table(TableName.Ads)] CloudTable adsTable,
             [Queue(QueueName.EmailsToSend)] IAsyncCollector<SendGridMessage> emailMessageQueue,
             ILogger log)
