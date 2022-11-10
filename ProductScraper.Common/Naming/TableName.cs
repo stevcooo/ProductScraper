@@ -10,5 +10,7 @@
         public const string IdentityIndex = "IdentityIndex";
         public const string IdentityRoles = "IdentityRoles";
         public const string IdentityUsers = "IdentityUsers";
+
+        public const string Ads = "Ads";
     }
 }

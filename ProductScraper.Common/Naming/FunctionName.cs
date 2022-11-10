@@ -15,5 +15,6 @@
         public const string EmailToSendGrid = "EmailToSendGrid";
         public const string GenerateProductUpdateEmail = "GenerateProductUpdateEmail";
         public const string AddProductInfoHistory = "AddProductInfoHistory";
+        public const string ScrapeCars = "ScrapeCars";
     }
 }
