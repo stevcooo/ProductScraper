@@ -114,6 +114,8 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 log.LogInformation($"EmailMessage Product updates");
                 await emailMessageQueue.AddAsync(emailMessage);
             }
+            // uncomment this one of you like to receive email when nothing is changed 
+            /*
             else if (userProfile.SendEmailWhenNoProductHasBeenChanged)
             {
                 log.LogInformation($"EmailMessage No Product update");
@@ -125,6 +127,7 @@ namespace ProductScraper.Functions.ScrapeFunctions
                 };
                 await emailMessageQueue.AddAsync(emailMessage);
             }
+            */
         }
     }
 }
