@@ -56,7 +56,7 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
                 
                 foreach (var ad in adsFromWeb)
                 {
-                    emailBodyBuilder.AppendLine($"<a href='https://www.pazar3.mk/${ad.Key}'>{ad.Value}</a>");
+                    emailBodyBuilder.AppendLine($"<a href='https://www.pazar3.mk{ad.Key}'>{ad.Value}</a>");
                     emailBodyBuilder.AppendLine("<br>");
                     var newAd = new Ad
                     {
