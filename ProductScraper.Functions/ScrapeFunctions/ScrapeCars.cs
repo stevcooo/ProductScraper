@@ -25,7 +25,7 @@ namespace ProductScraper.Functions.EmailNotificationsFunctions
             
             var browser = new ScrapingBrowser();
             var homePage = browser.NavigateToPage(new Uri("https://www.pazar3.mk/mk/TOYOTAAVTOCENTARSKOPJE"));
-            var adsFromWebNodes = homePage.Html.CssSelect(".search-result > .store-ad-item-description").ToArray();
+            var adsFromWebNodes = homePage.Html.CssSelect(".search-result > .store-goods-card-description").ToArray();
             var adsFromWeb = new Dictionary<string, string>();
             // generate links
             foreach (var ad in adsFromWebNodes)
